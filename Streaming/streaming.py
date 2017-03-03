@@ -35,6 +35,3 @@ if __name__ == '__main__':
     #This line filter Twitter Streams to capture data by the given keywords
     # TODO: change this by user's keyword
     stream.filter(track=['basketball'])
-
-# TODO: delete this and this
-# maybe this
