@@ -1,0 +1,6 @@
+*.iml
+/.idea/workspace.xml
+/.idea/inspectionProfiles
+.idea/
+/.idea/inspectionProfiles/profiles_settings.xml
+/credentials.txt
