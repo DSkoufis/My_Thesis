@@ -20,7 +20,7 @@ When you'll finish this, go to the project home folder (for example C:\path to f
 text file with name <credentials.txt>
 
 Add the following into the text file:
-
+======================================
 consumer_key:
 
 consumer_secret:
@@ -28,6 +28,7 @@ consumer_secret:
 access_token:
 
 access_token_secret:
+======================================
 
 and add after the ":" your personal tokens
 
