@@ -9,7 +9,7 @@ data analysis by applying some filters with queries.
 
 -------------------------------------------------------------------------------------------------------------------------------
 
-SPECS:
+# SPECS:
 
 to be able to run this program you need to add a file.
 
@@ -20,7 +20,7 @@ When you'll finish this, go to the project home folder (for example C:\path to f
 text file with name <credentials.txt>
 
 Add the following into the text file:
-======================================
+-----------------------------------------
 consumer_key:
 
 consumer_secret:
@@ -28,10 +28,10 @@ consumer_secret:
 access_token:
 
 access_token_secret:
-======================================
+-----------------------------------------
 
 and add after the ":" your personal tokens
 
-IMPORTANT:
+# IMPORTANT:
 
 make sure, not to publish your personal tokens
