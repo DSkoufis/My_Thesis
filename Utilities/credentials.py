@@ -12,7 +12,6 @@ def read():
 
             # this line deletes the line break character from the list
             content = [line.strip("\n") for line in open(path)]
-            print(content)
             print ("Reading credentials...")
     # handling the errors
     except IOError as e:
