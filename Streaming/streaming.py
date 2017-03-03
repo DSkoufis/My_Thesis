@@ -3,8 +3,8 @@ from tweepy import OAuthHandler
 from tweepy import Stream
 from Utilities import credentials
 
-creds = credentials.read() # this is a dictionary that holds the credentials
-creds_names = credentials.set_names() # this is a tuple that holds some strings with formal names
+creds = credentials.read()  # this is a dictionary that holds the credentials
+creds_names = credentials.set_names()  # this is a tuple that holds some strings with formal names
 
 # we gather our credential tokens into these variable to authenticate with twitter API
 consumer_key = creds[creds_names[0]]

@@ -2,20 +2,21 @@
 # This module is to handle the credentials from the credentials.txt
 # ----------------------------
 
+
 # This method reads the credentials of the credentials.txt and returns a dictionary with them
 def read():
     try:
-        credentials = {} # we will return this dictionary
-        path = "../credentials.txt" # path to our file. It is in the parent directory by default
+        credentials = {}  # we will return this dictionary
+        path = "../credentials.txt"  # path to our file. It is in the parent directory by default
         with open(path, "r") as creds:
             content = creds.readlines()  # this holds all credentials into a long list
 
-            # this line deletes the line break character from the list
-            content = [line.strip("\n") for line in open(path)]
-            print ("Reading credentials...")
+            # we must delete the line break character from the list
+            content = [line.strip("\n") for line in content]
+            print("Reading credentials...")
     # handling the errors
     except IOError as e:
-        print ("I/O error({0}): {1}".format(e.errno, e.strerror))
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
         return None
     except:
         print("Error on reading file")
@@ -31,11 +32,15 @@ def read():
             # every line is in name:tokens format
             credentials[line_i[0]] = line_i[1]  # from the smaller list, add the 1st element
             # into the dictionary with the key of the 0th element
-        except:
+        except IndexError:
+            # if the credentials.txt file is not well formatted it will throw an
+            # IndexError, because it has blank lines or trash
+            # in these cases we need our iteration just to continue reading next line
             continue
 
     print("Done!")
-    return credentials # return the dictionary
+    return credentials  # return the dictionary
+
 
 # this method returns a tuple with the formal names of the credentials.txt fields
 def set_names():
@@ -44,4 +49,3 @@ def set_names():
              "access_token",
              "access_token_secret",)
     return names
-
