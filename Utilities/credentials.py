@@ -13,7 +13,7 @@ def read():
             # this line deletes the line break character from the list
             content = [line.strip("\n") for line in open(path)]
             print(content)
-            print ("Reading credentials")
+            print ("Reading credentials...")
     # handling the errors
     except IOError as e:
         print ("I/O error({0}): {1}".format(e.errno, e.strerror))
@@ -21,17 +21,21 @@ def read():
     except:
         print("Error on reading file")
         return None
-    print("Done reading, starting to converting into dictionary")
 
     # go through the list one by one
     for line in content:
-        if line == "": # if there is an empty line
-            continue # skip it
-        line_i = line.split(":")  # split the content into a smaller list
-        # every line is in name:tokens format
-        credentials[line_i[0]] = line_i[1]  # from the smaller list, add the 1st element
-        # into the dictionary with the key of the 0th element
+        # if there is an empty line or a line not well formatted we don't want our program to crash!
+        # so it will gonna throw an exception in the split line, and we catch the exception
+        # to continue our operation normally
+        try:
+            line_i = line.split(":")  # split the content into a smaller list
+            # every line is in name:tokens format
+            credentials[line_i[0]] = line_i[1]  # from the smaller list, add the 1st element
+            # into the dictionary with the key of the 0th element
+        except:
+            continue
 
+    print("Done!")
     return credentials # return the dictionary
 
 # this method returns a tuple with the formal names of the credentials.txt fields
