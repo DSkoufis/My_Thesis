@@ -21,10 +21,10 @@ text file with name <credentials.txt>
 
 Add the following into the text file:
 
-consumer_key:\n
-consumer_secret:\n
-access_token:\n
-access_token_secret:\n
+consumer_key:
+consumer_secret:
+access_token:
+access_token_secret:
 
 and add after the ":" your personal tokens
 
