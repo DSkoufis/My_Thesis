@@ -13,7 +13,7 @@ access_token = creds[creds_names[2]]
 access_token_secret = creds[creds_names[3]]
 
 
-#This is a basic listener that just prints received tweets to stdout.
+# This is a basic listener that just prints received tweets to stdout.
 class StdOutListener(StreamListener):
 
     def on_data(self, data):
@@ -35,4 +35,3 @@ if __name__ == "__main__":
     # This line filter Twitter Streams to capture data by the given keywords
     # TODO: change this by user's keyword
     stream.filter(track=['basketball'])
-    print("HERE")
