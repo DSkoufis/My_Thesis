@@ -7,7 +7,6 @@ The idea, is to gather tweets from Twitter with the help of Twitter REST APIs, S
 data will go into a MongoDB for storing purposes. Finally, through a GUI, the user will be able to see some statistics or
 data analysis by applying some filters with queries.
 
--------------------------------------------------------------------------------------------------------------------------------
 
 # SPECS:
 
