@@ -30,6 +30,7 @@ def read():
         try:
             line_i = line.split(":")  # split the content into a smaller list
             # every line is in name:tokens format
+            line_i = [line.strip(" ") for line in line_i]
             credentials[line_i[0]] = line_i[1]  # from the smaller list, add the 1st element
             # into the dictionary with the key of the 0th element
         except IndexError:

@@ -31,7 +31,7 @@ access_token_secret:
 
 -----------------------------------------
 
-and add after the ":" complete your personal credentials.
+and after the ":" complete your personal credentials.
 
 # IMPORTANT:
 
