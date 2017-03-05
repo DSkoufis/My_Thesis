@@ -1,6 +1,7 @@
 from Utilities import credentials
 from tweepy import OAuthHandler
 from tweepy import Stream
+import tweepy
 
 # this method gets the credentials from Utilities.credentials.py and save them at a dictionary named creds
 def get_credentials():
@@ -20,3 +21,7 @@ def set_stream(listener):
     auth = set_oath() # we make the authentication
     stream = Stream(auth, listener) # and we setting the stream item
     return stream
+
+def set_api():
+    auth = set_oath()
+    return tweepy.API(auth)
