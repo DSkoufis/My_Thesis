@@ -19,7 +19,7 @@ def set_oath():
     return auth
 
 
-# this method returns a Stream item for our StreamListener class. It is used to get Streaming API calls
+# this method returns a Stream item for our StreamListener class. It is used to get API_calls API_calls
 def set_stream(listener):
     auth = set_oath() # we make the authentication
     stream = Stream(auth, listener) # and we setting the stream item

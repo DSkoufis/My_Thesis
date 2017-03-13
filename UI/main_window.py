@@ -8,12 +8,17 @@ class App:
         frame = Frame(master)
         frame.grid()
         frame.pack(side=TOP)
+        self.init_widgets(master)
 
-        self.button = Button(frame, text="Stream", command=streaming_window.stream_window)
-        self.button.pack(side=TOP)
+    def init_widgets(self, frame):
+        self.stream_btn = Button(frame, text="Start Streaming", command=streaming_window.stream_window)
+        self.stream_btn.pack(side=TOP)
+
+        self.exit_btn = Button(frame, text="Exit", command=frame.destroy)
+        self.exit_btn.pack(side=TOP)
 
 root = Tk()
-root.minsize(300, 150)
+root.minsize(400, 200)
 root.title("--Twitter API--")
 
 app = App(root)

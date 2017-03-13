@@ -4,11 +4,14 @@ from Utilities import database
 import json
 
 # this flag variable holds the boolean value to terminate the stream.
-flag = True  # If this become False, stream close
+flag = False  # If this become False, stream closes
 
 
 # this method starts the streaming API. To finish it, just make it's flag variable equals False
-def streaming_proc():
+# It gets as an argument the search keyword that the user gives
+def streaming_proc(search_keyword):
+    # TODO: move these 3 lines into calling module, to let user select his own values
+    # IMPORTANT: keep the same names though
     # we create this objects here, to have them in our hands during the "run" period and call them only once
     db_client = database.get_client()
     db_db = database.get_db(db_client, "test")
@@ -33,7 +36,7 @@ def streaming_proc():
                            }}
         return formatted_tweet
 
-    # this method inserts the tweet into the active MongoDB instance
+    # this method inserts the tweet into the active MongoDB instance that is passed through arguments
     def store_tweet(tweet):
         print("A tweet has stored")
         db_collection.insert(tweet)
@@ -43,7 +46,7 @@ def streaming_proc():
 
         def on_data(self, data):
             if not flag:  # check if the flag value became False.
-                print("Streaming stopped!")
+                print("API_calls stopped!")
                 return False  # if yes, then return False to terminate the streaming loop
             data = json.loads(data)
             if "user" not in data:  # if tweet has no user, we don't want this tweet
@@ -52,7 +55,8 @@ def streaming_proc():
             if data["lang"] != "en":  # we deal only with English language text based tweets
                 print("Tweet's language is not English - ignoring tweet.")
                 return True
-            our_tweet = process_tweet(data)  # we pass our data into this method to clean them and keep only the necessary
+            # we pass our data into this method to clean them and keep only the necessary
+            our_tweet = process_tweet(data)
             store_tweet(our_tweet)  # we add our tweets into the active MongoDB instance
             return True
 
@@ -63,7 +67,7 @@ def streaming_proc():
     stream = client.set_stream(listener)  # this is the stream item, responsible to open the stream for us
 
     # This line filter Twitter Streams to capture data by the given keywords
-    # TODO: change this by user's keyword
-    stream.filter(track=["basketball"])
+    print("Searching Twitter for '" + search_keyword + "'.")
+    stream.filter(track=[search_keyword])
 
 
