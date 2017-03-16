@@ -17,6 +17,7 @@ api = client.set_api()
 # TODO: Left here, continue from here
 # see http://www.karambelkar.info/2015/01/how-to-use-twitters-search-rest-api-most-effectively./
 # to continue
+# see search tweet for reference when building tweet
 
 # this just prints the tweets
 # TODO: I don't really need this
