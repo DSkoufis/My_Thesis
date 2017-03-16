@@ -1,20 +1,25 @@
 {
-    "created_at": "String	UTC time when this Tweet was created",
-    "favorite_count": 0,
-    "id_str": "The string representation of the unique identifier for this Tweet",
-    "lang": "'und' if no language could be detected",
-    "retweet_count": 1958,
-    "text": "a text in UTF-8 format",
+    "created_at": #STRING#,  # UTC time when this Tweet was created
+    "favorite_count": #INT#,  # how many times this Tweet has been liked by Twitter users
+    "id_str": #STRING#,  # The string representation of the unique identifier for this Tweet
+    "lang": #STRING#,  # 'und' if no language could be detected
+    "retweet_count": #INT#,  # number of retweets this tweet has
+    "text": #STRING#,  # a text in UTF-8 format
     "user": {
-        "favourites_count": 3858, # number of tweets this user favourited
-        "followers_count": 21 # number of followers this user has
-        "friends_count": 32 # number of users this user follows
-        "id_str": "6253282" # string representation of unique user id
-        "statuses_count": 29834 # number of user tweets + retweets
-        "verified": false
+        "favourites_count": #INT#,  # number of tweets this user favourited
+        "followers_count": #INT#,  # number of followers this user has
+        "friends_count": #INT#,  # number of users this user follows
+        "id_str": #STRING#,  # string representation of unique user id
+        "statuses_count": #INT#,  # number of user tweets + retweets
+        "verified": #BOOLEAN#,  # (true,false) When true, indicates that the user has a verified account
+        "created_at": #STRING#,  # String UTC time when this account was created
+        "geo_enabled": #BOOLEAN#,  # (true,false) when true, indicates that the user has enabled the possibility of geotagging their Tweets
+        "location": #STRING#,  # Nullable . The user-defined location for this account’s profile
+        "time_zone": #STRING#,  # Nullable . A string describing the Time Zone this user declares themselves within
+        "utc_offset": #INT#,  # Nullable . The offset from GMT/UTC in seconds
     }
 }
 
 
-more info : https://dev.twitter.com/overview/api/tweets
-        and https://dev.twitter.com/overview/api/users
+more info : https://dev.twitter.com/overview/api/tweets  # for tweets json info
+        and https://dev.twitter.com/overview/api/users  # for user json info

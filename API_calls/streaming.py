@@ -4,6 +4,7 @@ from Utilities import database
 import json
 
 # this flag variable holds the boolean value to terminate the stream.
+# When we call this method from streaming_window, we change this value into True to start the stream
 flag = False  # If this become False, stream closes
 
 
@@ -15,7 +16,7 @@ def streaming_proc(search_keyword):
     # we create this objects here, to have them in our hands during the "run" period and call them only once
     db_client = database.get_client()
     db_db = database.get_db(db_client, "test")
-    db_collection = database.get_collection(db_db, "test collection2")
+    db_collection = database.get_collection(db_db, "stream collection")
 
     # in this method we keep only the values we need from our tweet
     def process_tweet(tweet):
@@ -23,7 +24,6 @@ def streaming_proc(search_keyword):
         formatted_tweet = {"created_at": tweet["created_at"],
                            "favourite_count": tweet["favorite_count"],
                            "id_str": tweet["id_str"],
-                           "lang": tweet["lang"],
                            "retweet_count": tweet["retweet_count"],
                            "text": tweet["text"],
                            "user": {
@@ -33,6 +33,11 @@ def streaming_proc(search_keyword):
                                "id_str": tweet["user"]["id_str"],
                                "statuses_count": tweet["user"]["statuses_count"],
                                "verified": tweet["user"]["verified"],
+                               "created_at": tweet["user"]["created_at"],
+                               "geo_enabled": tweet["user"]["geo_enabled"],
+                               "location": tweet["user"]["location"],
+                               "time_zone": tweet["user"]["time_zone"],
+                               "utc_offset": tweet["user"]["utc_offset"]
                            }}
         return formatted_tweet
 
