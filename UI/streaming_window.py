@@ -21,13 +21,17 @@ class Stream:
         self.stop_button = Button(frame, text="Stop", command=lambda: stop_stream())
         self.stop_button.pack()
 
+        self.pause_stream_button = Button(frame, text="Pause", command=lambda: pause_stream())
+
 
 def start_stream(search_keyword):
     if search_keyword is not "" and streaming.flag is False:
         streaming.flag = True
-        my_thread = threading.Thread(target=lambda: streaming.streaming_proc(search_keyword))
+        global stream_thread
+        stream_thread = threading.Thread(target=lambda: streaming.streaming_proc(search_keyword))
+        event_listener = threading.Event()
         print("Starting stream...")
-        my_thread.start()
+        stream_thread.start()
 
     else:
         if search_keyword is "":
@@ -36,7 +40,13 @@ def start_stream(search_keyword):
             print("Stream already running!")
 
 
+def pause_stream():
+    streaming.flag = False
+
+
 def stop_stream():
+    # TODO: this must change to stop the thread
+    # maybe reference to https://www.safaribooksonline.com/library/view/python-cookbook-2nd/0596007973/ch09s03.html
     streaming.flag = False
 
 
@@ -51,8 +61,8 @@ def stream_window():
     root.title("--Streaming API--")
     app = Stream(root)
 
-# TODO: let the user choose a db and collection name + if new db -> host and port
-# TODO: show into window console's messages
+    # TODO: let the user choose a db and collection name + if new db -> host and port
+    # TODO: show into window console's messages
 
     root.protocol("WM_DELETE_WINDOW", lambda: on_exit(root))
     root.mainloop()

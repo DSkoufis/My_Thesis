@@ -3,6 +3,8 @@ from Utilities import client
 from Utilities import database
 
 # TODO: make this callable from a GUI window
+# as long as flag equals True, API runs
+flag = True
 
 # TODO: move these 3 lines into calling module, to let user select his own values
 # IMPORTANT: keep the same names though (db_client etc)
@@ -13,9 +15,6 @@ db_collection = database.get_collection(db_db, "search collection")
 
 # we are getting a reference into API item
 api = client.set_api()
-
-# as long as flag equals True, API runs
-flag = True
 
 query = "trump"  # TODO: let the user pick this
 tweets_per_query = 100  # how many tweets we can ask for
