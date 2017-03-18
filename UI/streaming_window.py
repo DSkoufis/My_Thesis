@@ -40,6 +40,11 @@ def stop_stream():
     streaming.flag = False
 
 
+def on_exit(root):
+    stop_stream()
+    root.destroy()
+
+
 def stream_window():
     root = Tk()
     root.minsize(400, 200)
@@ -49,4 +54,5 @@ def stream_window():
 # TODO: let the user choose a db and collection name + if new db -> host and port
 # TODO: show into window console's messages
 
+    root.protocol("WM_DELETE_WINDOW", lambda: on_exit(root))
     root.mainloop()
