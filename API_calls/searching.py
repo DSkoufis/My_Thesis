@@ -2,9 +2,12 @@ import tweepy
 from Utilities import client
 from Utilities import database
 
+# this flag value holds the boolean value for the while loop
+# that is responsible to call the Search API and get new tweets
 flag = False
 
 
+# we declare getter and setter to handle the value of our flag
 def get_flag():
     return flag
 
@@ -64,7 +67,7 @@ def searching_proc(keyword):
     def store_tweet(tweet):
         db_collection.insert(tweet)
 
-    while get_flag():
+    while get_flag():  # flag is True when we start this function from the search window
         try:
             if max_ID <= 0:
                 if not since_ID:
@@ -79,13 +82,14 @@ def searching_proc(keyword):
                                             max_id=str(max_ID - 1), since_id=since_ID)
 
             if not new_tweets:
+                # if we don't get any new tweets
                 print("No more tweets found!")
-                set_flag(False)
+                set_flag(False)  # and we setting the flag that is responsible for while loop
                 break
 
             # logging some info into console
-            tweet_count += len(new_tweets)
-            print("Downloaded {0} tweets till now".format(tweet_count))
+            tweet_count += len(new_tweets)  # we count how many tweets we got
+            print("Downloaded {0} tweets till now".format(tweet_count))  # and we print them
             print("Storing them in DB...")
 
             # after many tests (near 30.000 tweets sample)
@@ -94,14 +98,14 @@ def searching_proc(keyword):
             # We can store them immediately
             # =======================================================================================#
             for tweet in new_tweets:
-                # we pass our data into this method to clean them and keep only the necessary
+                # we pass our data into this method to clean them and keep only the necessary data
                 our_tweet = process_tweet(tweet)
                 store_tweet(our_tweet)  # we add our tweets into the active MongoDB instance
 
             print("Store complete.")
-            max_ID = new_tweets[-1].id
+            max_ID = new_tweets[-1].id  # we need to re - set the max_ID for the new search query
         except tweepy.TweepError as error:
-            print("Error: " + str(error))
-            set_flag(False)
+            print("Error: " + str(error))  # we log the error
+            set_flag(False)  # and we setting the flag that is responsible for while loop
             break
 
