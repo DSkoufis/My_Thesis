@@ -22,14 +22,13 @@ class Stream:
         self.stop_button.pack()
 
         self.pause_stream_button = Button(frame, text="Pause", command=lambda: pause_stream())
+        self.pause_stream_button.pack()
 
 
 def start_stream(search_keyword):
     if search_keyword is not "" and streaming.flag is False:
         streaming.flag = True
-        global stream_thread
         stream_thread = threading.Thread(target=lambda: streaming.streaming_proc(search_keyword))
-        event_listener = threading.Event()
         print("Starting stream...")
         stream_thread.start()
 
