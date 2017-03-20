@@ -1,6 +1,7 @@
 from tkinter import *
 from UI import streaming_window
 from UI import searching_window
+from Utilities import window_utils
 
 
 class App(Frame):
@@ -17,12 +18,8 @@ class App(Frame):
         search_btn = Button(self, text="Start Search API", command=searching_window.search_window)
         search_btn.pack(side=TOP)
 
-        exit_btn = Button(self, text="Exit", command=lambda: close_window(self.root))
+        exit_btn = Button(self, text="Exit", command=lambda: window_utils.close_window(self.root))
         exit_btn.pack(side=TOP)
-
-
-def close_window(master):
-    master.destroy()
 
 root = Tk()
 root.minsize(400, 200)

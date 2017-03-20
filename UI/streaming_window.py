@@ -1,5 +1,6 @@
 from tkinter import *
 from API_calls import streaming
+from Utilities import window_utils
 import threading
 
 
@@ -21,8 +22,8 @@ class Stream:
         self.stop_button = Button(frame, text="Stop", command=lambda: stop_stream())
         self.stop_button.pack()
 
-        self.pause_stream_button = Button(frame, text="Pause", command=lambda: pause_stream())
-        self.pause_stream_button.pack()
+        self.exit_stream_button = Button(frame, text="Exit", command=lambda: window_utils.close_window(master))
+        self.exit_stream_button.pack()
 
 
 def start_stream(search_keyword):
@@ -37,10 +38,6 @@ def start_stream(search_keyword):
             print("Give a keyword to search Twitter.")
         else:
             print("Stream already running!")
-
-
-def pause_stream():
-    streaming.flag = False
 
 
 def stop_stream():

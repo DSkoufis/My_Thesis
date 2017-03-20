@@ -1,19 +1,14 @@
 from tkinter import *
 from API_calls import searching
+from Utilities import window_utils
 import threading
-
-data_incoming = False
-
-
-def set_data_incoming(value):
-    global data_incoming
-    data_incoming = value
 
 
 # this class is a Frame class with some buttons (formally the search window)
 class Search(Frame):
     def __init__(self, master):
         super(Search, self).__init__(master)  # we call the super constructor
+        self.root = master
         self.grid()
         self.init_widgets()  # and we initialize our widgets
 
@@ -37,6 +32,11 @@ class Search(Frame):
         self.stop_search_btn = Button(self, text="Stop", command=lambda: stop_search())
         self.stop_search_btn.pack()
 
+        # when we press this button, window closes
+        # by calling main_window.close_window(root window) method
+        self.close_window_btn = Button(self, text="Exit", command=lambda: window_utils.close_window(self.root))
+        self.close_window_btn.pack()
+
 
 def start_search(keyword):
     # we do some validation here if user gave a value into Entry
@@ -55,8 +55,11 @@ def start_search(keyword):
 
 # with this function, we stop the Search API calls
 def stop_search():
-    print("API_calls stopped!")
-    searching.set_flag(False)
+    if searching.get_flag():  # if the flag is True
+        print("API_calls stopped!")
+        searching.set_flag(False)  # stop it
+    else:
+        print("Search already stopped")  # else do nothing
 
 
 # with this function, we exit the window
