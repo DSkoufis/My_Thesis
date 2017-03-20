@@ -2,14 +2,16 @@ from tkinter import *
 from API_calls import searching
 import threading
 
+data_incoming = False
+
+
+def set_data_incoming(value):
+    global data_incoming
+    data_incoming = value
+
 
 # this class is a Frame class with some buttons (formally the search window)
 class Search(Frame):
-    # these are the buttons
-    start_search_btn = Button()
-    stop_search_btn = Button()
-    search_keyword = Entry()
-
     def __init__(self, master):
         super(Search, self).__init__(master)  # we call the super constructor
         self.grid()

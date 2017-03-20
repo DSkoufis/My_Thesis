@@ -5,8 +5,8 @@ from UI import searching_window
 
 class App(Frame):
     def __init__(self, master):
-        self.root = master
         super(App, self).__init__(master)
+        self.root = master
         self.grid()
         self.init_widgets()
 
@@ -29,6 +29,6 @@ root.minsize(400, 200)
 root.title("--Twitter API--")
 
 app = App(root)
-app.pack(side=TOP)
+app.pack()
 
 root.mainloop()
