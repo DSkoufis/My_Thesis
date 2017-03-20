@@ -18,12 +18,8 @@ def set_flag(value):
 
 
 def searching_proc(keyword):
-    # TODO: move these 3 lines into calling module, to let user select his own values
-    # IMPORTANT: keep the same names though (db_client etc)
-    # we create this objects here, to have them in our hands during the "run" period and call them only once
-    db_client = database.get_client()
-    db_db = database.get_db(db_client, "test")
-    db_collection = database.get_collection(db_db, "search collection")
+    # we get the collection to add our documents
+    db_collection = database.db_collection
 
     # we are getting a reference into API item
     api = client.set_api()

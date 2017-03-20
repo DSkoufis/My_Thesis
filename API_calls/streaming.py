@@ -11,12 +11,8 @@ flag = False  # If this become False, stream closes
 # this method starts the streaming API. To finish it, just make it's flag variable equals False
 # It gets as an argument the search keyword that the user gives
 def streaming_proc(search_keyword):
-    # TODO: move these 3 lines into calling module, to let user select his own values
-    # IMPORTANT: keep the same names though
-    # we create this objects here, to have them in our hands during the "run" period and call them only once
-    db_client = database.get_client()
-    db_db = database.get_db(db_client, "test")
-    db_collection = database.get_collection(db_db, "stream collection")
+    # we are getting in our hands the collection to save incoming data
+    db_collection = database.db_collection
 
     # in this method we keep only the values we need from our tweet
     def process_tweet(tweet):

@@ -15,27 +15,27 @@ class Search(Frame):
     def init_widgets(self):
         # init widgets
         keyword_lbl = Label(self, text="Keyword:")
-        keyword_lbl.pack()
+        keyword_lbl.grid(row=0, column=1, sticky=E, padx=10)
 
         self.search_keyword = Entry(self, width=30)  # this Entry gets the keyword that the user gives
-        self.search_keyword.pack()
+        self.search_keyword.grid(row=0, column=2)
 
         # when we press this button, search starts
         # by calling start_search function with keyword argument
         # that we get from Entry
-        self.start_search_btn = Button(self, text="Stream",
-                                   command=lambda: start_search(self.search_keyword.get()), width=30)
-        self.start_search_btn.pack()
+        self.start_search_btn = Button(self, text="Search",
+                                   command=lambda: start_search(self.search_keyword.get()), width=15)
+        self.start_search_btn.grid(row=2, column=1, sticky=E, padx=5)
 
         # when we press this button, search stops
         # by calling stop_search function
-        self.stop_search_btn = Button(self, text="Stop", command=lambda: stop_search())
-        self.stop_search_btn.pack()
+        self.stop_search_btn = Button(self, text="Stop", command=lambda: stop_search(), width=15)
+        self.stop_search_btn.grid(row=2, column=2, sticky=W, padx=5)
 
         # when we press this button, window closes
         # by calling main_window.close_window(root window) method
-        self.close_window_btn = Button(self, text="Exit", command=lambda: window_utils.close_window(self.root))
-        self.close_window_btn.pack()
+        self.close_window_btn = Button(self, text="Exit", command=lambda: window_utils.close_window(self.root), width=15)
+        self.close_window_btn.grid(row=3, column=1, columnspan=3)
 
 
 def start_search(keyword):
@@ -64,8 +64,7 @@ def stop_search():
 
 # with this function, we exit the window
 def on_exit(root):
-    stop_search()
-    root.destroy()
+    window_utils.close_window(root)
 
 
 # this function is called from main window to show searching window
