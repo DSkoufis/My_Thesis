@@ -3,9 +3,10 @@ from Utilities import client
 from Utilities import database
 import json
 
-# this flag variable holds the boolean value to terminate the stream.
-# When we call this method from streaming_window, we change this value into True to start the stream
-flag = False  # If this become False, stream closes
+# this flags variables hold the boolean values to terminate or pause the stream.
+# When we call this var from streaming_window, we change this value into True to start the stream
+stop_flag = False  # If this become False, stream closes (Authentication needed again)
+pause_flag = False  # If this become False, stream pause (No need to re-authenticate when start)
 
 
 # this method starts the streaming API. To finish it, just make it's flag variable equals False
@@ -44,11 +45,11 @@ def streaming_proc(search_keyword):
 
     # This is a basic listener that just prints received tweets to stdout.
     class StdOutListener(StreamListener):
-
         def on_data(self, data):
-            if not flag:  # check if the flag value became False.
-                print("API_calls stopped!")
+            if not stop_flag:  # check if the flag value became False.
                 return False  # if yes, then return False to terminate the streaming loop
+            if not pause_flag:
+                return True  # if user wants to pause, don't do anything with new data
             data = json.loads(data)
             if "user" not in data:  # if tweet has no user, we don't want this tweet
                 print("No user data - ignoring tweet.")

@@ -88,7 +88,7 @@ def searching_proc(keyword):
             print("Downloaded {0} tweets till now".format(tweet_count))  # and we print them
             print("Storing them in DB...")
 
-            # after many tests (near 30.000 tweets sample)
+            # after many tests (near 30.000 tweets collection sample)
             # I found out that language is always "en" and all tweets have user data.
             # so there is no reason to validate here our data like we do in streaming.py
             # We can store them immediately
