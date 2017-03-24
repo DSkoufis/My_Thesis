@@ -32,4 +32,6 @@ root.title("--Twitter API--")
 app = App(root)
 app.pack()
 
+root.protocol("WM_DELETE_WINDOW", lambda: window_utils.close_window(root))
+
 root.mainloop()

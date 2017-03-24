@@ -8,7 +8,7 @@ def read():
     try:
         credentials = {}  # we will return this dictionary
         # TODO: check in which folder is the main program and set the dots
-        path = "../credentials.txt"  # path to our file. It is in the parent directory by default
+        path = "./credentials.txt"  # path to our file. It is in the parent directory by default
         with open(path, "r") as creds:
             content = creds.readlines()  # this holds all credentials into a long list
 
