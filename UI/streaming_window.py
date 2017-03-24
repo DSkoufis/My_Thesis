@@ -1,6 +1,5 @@
 from tkinter import *
 from API_calls import streaming
-from Utilities import window_utils as util
 import threading
 
 # This boolean, keeps track, if a new thread have created
@@ -8,24 +7,32 @@ import threading
 new_thread = True
 
 
+def get_new_thread():
+    return new_thread
+
+
+def set_new_thread(value):
+    global new_thread
+    new_thread = value
+
+
 # this method called when "Stream" button is pressed
 # it checks if previous stream stopped or paused and do accordingly
 def start_stream(search_keyword):
-    global new_thread
     # if user gave keyword and stream is not running do:
-    if search_keyword is not "" and (streaming.stop_flag is False or streaming.pause_flag is False):
-        if new_thread:
+    if search_keyword is not "" and (streaming.get_stop_flag() is False or streaming.get_pause_flag() is False):
+        if get_new_thread():
             print("Starting stream...")
             # we initialize the flags
-            streaming.stop_flag = True
-            streaming.pause_flag = True
-            new_thread = False  # we make global variable into False, because thread already created
+            streaming.set_stop_flag(True)
+            streaming.set_pause_flag(True)
+            set_new_thread(False)  # we make global variable into False, because thread already created
             # start the new thread
             stream_thread = threading.Thread(target=lambda: streaming.streaming_proc(search_keyword))
             stream_thread.start()
         else:
             print("Continuing stream...")
-            streaming.pause_flag = True
+            streaming.set_pause_flag(True)
     else:  # else check what is the problem and print
         if search_keyword is "":
             print("Give a keyword to search Twitter.")
@@ -34,19 +41,22 @@ def start_stream(search_keyword):
 
 
 def stop_stream():
-    global new_thread
-    print("Terminating stream...")
-    # on stop, we need to terminate both flags
-    streaming.pause_flag = False
-    streaming.stop_flag = False
-    new_thread = True
-    # TODO: this must change to stop the thread
-    # maybe reference to https://www.safaribooksonline.com/library/view/python-cookbook-2nd/0596007973/ch09s03.html
+    if streaming.get_stop_flag():
+        print("Terminating stream...")
+        # on stop, we need to terminate both flags
+        streaming.set_pause_flag(False)
+        streaming.set_stop_flag(False)
+        set_new_thread(True)
+    else:
+        print("Stream already stopped.")
 
 
 def pause_stream():
-    print("Stream paused!")
-    streaming.pause_flag = False
+    if streaming.get_pause_flag():
+        print("Stream paused!")
+        streaming.set_pause_flag(False)
+    else:
+        print("Stream already paused.")
 
 
 def on_exit(root):
@@ -90,7 +100,7 @@ def stream_window():
     # add widgets onto --- exit_frm ---
     # TODO: if I want to close frames only, change this lambda
     exit_stream_button = Button(exit_frm, text="Exit", width=20,
-                                command=lambda: util.close_window(root))
+                                command=lambda: on_exit(root))
     exit_stream_button.pack()
 
     # TODO: let the user choose a db and collection name + if new db -> host and port

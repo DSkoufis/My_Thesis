@@ -9,7 +9,26 @@ stop_flag = False  # If this become False, stream closes (Authentication needed 
 pause_flag = False  # If this become False, stream pause (No need to re-authenticate when start)
 
 
-# this method starts the streaming API. To finish it, just make it's flag variable equals False
+# getters and setters for the flags
+def get_stop_flag():
+    return stop_flag
+
+
+def set_stop_flag(value):
+    global stop_flag
+    stop_flag = value
+
+
+def get_pause_flag():
+    return pause_flag
+
+
+def set_pause_flag(value):
+    global pause_flag
+    pause_flag = value
+
+
+# this method starts the streaming API. To finish it, just make it's stop_flag variable equals False
 # It gets as an argument the search keyword that the user gives
 def streaming_proc(search_keyword):
     # we are getting in our hands the collection to save incoming data
@@ -46,9 +65,9 @@ def streaming_proc(search_keyword):
     # This is a basic listener that just prints received tweets to stdout.
     class StdOutListener(StreamListener):
         def on_data(self, data):
-            if not stop_flag:  # check if the flag value became False.
+            if not get_stop_flag():  # check if the stop_flag value became False.
                 return False  # if yes, then return False to terminate the streaming loop
-            if not pause_flag:
+            if not get_pause_flag():
                 return True  # if user wants to pause, don't do anything with new data
             data = json.loads(data)
             if "user" not in data:  # if tweet has no user, we don't want this tweet
