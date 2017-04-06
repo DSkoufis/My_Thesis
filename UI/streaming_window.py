@@ -103,7 +103,6 @@ def stream_window():
                                 command=lambda: on_exit(root))
     exit_stream_button.pack()
 
-    # TODO: let the user choose a db and collection name + if new db -> host and port
     # TODO: show into window console's messages
 
     root.protocol("WM_DELETE_WINDOW", lambda: on_exit(root))

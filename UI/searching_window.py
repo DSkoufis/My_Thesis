@@ -1,6 +1,5 @@
 from tkinter import *
 from API_calls import searching
-from Utilities import window_utils
 import threading
 
 # This boolean, keeps track, if a new thread have created
@@ -101,7 +100,6 @@ def search_window():
                                 command=lambda: on_exit(root))
     exit_stream_button.pack()
 
-    # TODO: let the user choose a db and collection name + if new db -> host and port
     # TODO: show into window console's messages
 
     root.protocol("WM_DELETE_WINDOW", lambda: on_exit(root))
