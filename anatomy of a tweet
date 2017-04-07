@@ -23,3 +23,25 @@
 
 more info : https://dev.twitter.com/overview/api/tweets  # for tweets json info
         and https://dev.twitter.com/overview/api/users  # for user json info
+
+{
+        "_id" : ObjectId("58d05b4401cf2712246fddfe"),
+        "retweet_count" : 0,
+        "created_at" : "Mon Mar 20 22:44:19 +0000 2017",
+        "text" : "RT @annetdonahue: The Trump administration is Bruce Ismay saying the ship can't sink and Comey is Mr. Andrews assuring them that it's made…",
+        "id_str" : "843956394613248000",
+        "user" : {
+                "geo_enabled" : true,
+                "location" : "San Antonio, TX",
+                "created_at" : "Wed Aug 22 00:59:33 +0000 2012",
+                "friends_count" : 481,
+                "followers_count" : 109,
+                "id_str" : "772592352",
+                "verified" : false,
+                "utc_offset" : -18000,
+                "statuses_count" : 3240,
+                "time_zone" : "Central Time (US & Canada)",
+                "favourites_count" : 1100
+        },
+        "favourite_count" : 0
+}

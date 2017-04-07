@@ -1,6 +1,7 @@
 from tweepy.streaming import StreamListener
 from Utilities import client
 from Utilities import database
+from datetime import datetime
 import json
 
 # this flags variables hold the boolean values to terminate or pause the stream.
@@ -32,12 +33,12 @@ def set_pause_flag(value):
 # It gets as an argument the search keyword that the user gives
 def streaming_proc(search_keyword):
     # we are getting in our hands the collection to save incoming data
-    db_collection = database.db_collection
+    db_collection = database.get_collection()
 
     # in this method we keep only the values we need from our tweet
     def process_tweet(tweet):
         # see "anatomy of a tweet" for more details
-        formatted_tweet = {"created_at": tweet["created_at"],
+        formatted_tweet = {"created_at": datetime.strptime(tweet["created_at"], "%a %b %d %H:%M:%S %z %Y"),
                            "favourite_count": tweet["favorite_count"],
                            "id_str": tweet["id_str"],
                            "retweet_count": tweet["retweet_count"],
@@ -49,7 +50,7 @@ def streaming_proc(search_keyword):
                                "id_str": tweet["user"]["id_str"],
                                "statuses_count": tweet["user"]["statuses_count"],
                                "verified": tweet["user"]["verified"],
-                               "created_at": tweet["user"]["created_at"],
+                               "created_at": datetime.strptime(tweet["user"]["created_at"], "%a %b %d %H:%M:%S %z %Y"),
                                "geo_enabled": tweet["user"]["geo_enabled"],
                                "location": tweet["user"]["location"],
                                "time_zone": tweet["user"]["time_zone"],

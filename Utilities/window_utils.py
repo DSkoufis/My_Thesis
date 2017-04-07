@@ -1,13 +1,14 @@
 
+
 # this method closes the window (master) that passed as argument
 def close_window(master):
     master.destroy()
 
 
-# function that gets called whenever host entry is clicked in main_window
+# function that gets called whenever an entry is clicked in main_window
 def on_host_click(event):
     entry = event.widget
-    if entry.get() == "e.g localhost":
+    if entry.get() == "e.g localhost" :
         entry.delete(0, "end")  # delete all the text in the entry
         entry.insert(0, '')  # Insert blank for user input
         entry.config(fg='black')

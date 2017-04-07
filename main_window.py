@@ -7,6 +7,7 @@ from Utilities import window_utils as wu
 import json
 
 
+# this is the main frame of the Application (menu)
 class MainFrame(Frame):
     def __init__(self, master):
         super(MainFrame, self).__init__(master)
@@ -14,6 +15,7 @@ class MainFrame(Frame):
         self.init_widgets()
 
     def init_widgets(self):
+        # adding the buttons into Application frame
         stream_btn = Button(self, text="Start Streaming", command=stream.stream_window, pady=3)
         stream_btn.pack(pady=3)
 
@@ -30,6 +32,7 @@ class MainFrame(Frame):
         exit_btn.pack(pady=3)
 
 
+# with this frame we initialize the data for the connection with MongoDB
 class DbFrame(Frame):
     def __init__(self, master):
         super(DbFrame, self).__init__(master)
@@ -46,7 +49,7 @@ class DbFrame(Frame):
         collection_lbl.grid(column=2, row=3, pady=2, padx=10)
 
         # then entries
-        self.host_entry = Entry(self, width=30)  # entry for port selection
+        self.host_entry = Entry(self, width=30)  # entry for host selection
         self.host_entry.insert(0, "e.g localhost")  # adding a place holder
         self.host_entry.bind('<FocusIn>', wu.on_host_click)
         self.host_entry.bind('<FocusOut>', wu.on_host_out)
@@ -60,21 +63,21 @@ class DbFrame(Frame):
         self.port_entry.config(fg='grey')
         self.port_entry.grid(column=3, row=1)
 
-        self.database_entry = Entry(self, width=30)  # entry for port selection
+        self.database_entry = Entry(self, width=30)  # entry for database selection
         self.database_entry.insert(0, "name of the database")  # adding a place holder
         self.database_entry.bind('<FocusIn>', wu.on_database_click)
         self.database_entry.bind('<FocusOut>', wu.on_database_out)
         self.database_entry.config(fg='grey')
         self.database_entry.grid(column=3, row=2)
 
-        self.collection_entry = Entry(self, width=30)  # entry for port selection
+        self.collection_entry = Entry(self, width=30)  # entry for collection selection
         self.collection_entry.insert(0, "collection's name")  # adding a place holder
         self.collection_entry.bind('<FocusIn>', wu.on_collection_click)
         self.collection_entry.bind('<FocusOut>', wu.on_collection_out)
         self.collection_entry.config(fg='grey')
         self.collection_entry.grid(column=3, row=3)
 
-        # apply button widgets for next or exit
+        # apply button widgets for next and exit
         next_btn = Button(self, text="Next", width=20, command=lambda: pack_main_frame(self.root, self))
         next_btn.grid(column=2, row=5, columnspan=2, pady=10, ipady=2)
 
@@ -96,6 +99,44 @@ class DbFrame(Frame):
         temp_dict["collection"] = collection
 
         return temp_dict
+
+    # these methods are setting each entry individually. They are used from check_if_data function
+    # to set each entry, with data from mongo.json file
+    def set_host(self, data):
+        self.host_entry.delete(0, "end")  # delete all the text in the entry
+        self.host_entry.insert(0, data)  # Insert host name from mongo.json
+        self.host_entry.config(fg='black')
+
+    def set_port(self, data):
+        self.port_entry.delete(0, "end")
+        self.port_entry.insert(0, data)
+        self.port_entry.config(fg='black')
+
+    def set_database(self, data):
+        self.database_entry.delete(0, "end")
+        self.database_entry.insert(0, data)
+        self.database_entry.config(fg='black')
+
+    def set_collection(self, data):
+        self.collection_entry.delete(0, "end")
+        self.collection_entry.insert(0, data)
+        self.collection_entry.config(fg='black')
+
+
+# this function is called when db frame is shown, to fill with previous data the cells
+def check_if_data(db_frm):
+    with open("mongo.json") as data_file:
+        data = json.load(data_file)
+
+    # if mongo.json have previous data, show them
+    if data["host"] != "":
+        db_frm.set_host(data["host"])
+    if data["port"] != 0:
+        db_frm.set_port(data["port"])
+    if data["database"] != "":
+        db_frm.set_database(data["database"])
+    if data["collection"] != "":
+        db_frm.set_collection(data["collection"])
 
 
 # this method hides the current window and shows Mongo initialization
@@ -121,17 +162,18 @@ def pack_main_frame(root, hide_frm):
     main_frm.pack()
 
 
-# this method hides the Mongo window and shows main window
+# this method hides the Application window and shows main window
 def pack_init_frame(root, hide_frm):
     hide_frm.pack_forget()
     db_frm = DbFrame(root)
+    check_if_data(db_frm)
     db_frm.pack()
 
 
 # this function is responsible to write back to mongo.json file the values of the entries' fields
 def write_json(data):
     with open("mongo.json", "w") as outfile:
-        json.dump(data, outfile, sort_keys=True, indent=4)
+        json.dump(data, outfile, sort_keys=True, indent=2)
 
 
 """ starting the main window  -- Program starts -- """
@@ -141,6 +183,7 @@ root.title("--Twitter API--")
 
 # build the starting frame
 db_frm = DbFrame(root)  # this frame holds the starting screen in which user selects database and collection
+check_if_data(db_frm)
 db_frm.pack()
 
 

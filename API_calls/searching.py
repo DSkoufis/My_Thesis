@@ -57,7 +57,7 @@ def process_tweet(tweet):
 
 def searching_proc(keyword):
     # we get the collection to add our documents
-    db_collection = database.db_collection
+    db_collection = database.get_collection()
 
     # we are getting a reference into API item
     api = client.set_api()
@@ -93,6 +93,7 @@ def searching_proc(keyword):
             if not new_tweets:
                 # if we don't get any new tweets
                 print("No more tweets found!")
+                print("Terminating...")
                 set_stop_flag(False)  # and we setting the stop_flag that is responsible for while loop
                 break
 
