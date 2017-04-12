@@ -1,6 +1,6 @@
 {
-  "collection": "",
-  "database": "",
-  "host": "",
-  "port": 0
+  "collection": "ss",
+  "database": "test",
+  "host": "localhost",
+  "port": 27017
 }

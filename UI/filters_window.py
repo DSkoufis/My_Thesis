@@ -47,4 +47,82 @@ def filters_window():
     max_status_txt = Label(stats_frame, text=max_status_sum)
     max_status_txt.grid(row=3, column=2, sticky=W)
 
+    # TODO: This is for testing
+    '''
+    this is for test
+    
+    it works!
+    '''
+    # a button that finds all different time zones and print them
+    def calculate_time_zone():
+        zones = []
+        query_cursor = db_collection.find()
+        counter = 0
+        for item in query_cursor:
+            counter += 1
+            zone = item["user"]["time_zone"]
+            if zone is not None and zone not in zones:
+                zones.append(zone)
+        for zone in zones:
+            print(zone)
+        print("Length: " + str(len(zones)))
+        print(counter)
+
+    time_zones_btn = Button(stats_frame, text="Calculate & Print",command=calculate_time_zone)
+    time_zones_btn.grid(row=4, column=2, columnspan=2, pady=10)
+
+    # TODO: This is for testing
+    '''
+    this is for test
+    
+    and it works!!
+    '''
+    # button that finds distribution of retweets and shows histogram
+    import matplotlib.pyplot as plt
+
+    def calculate_retweets_map():
+        count = {}  # this is a dict that indicates how many times a retweet occurred. e.g 255 retweet_count found 25
+        olist = []  # this list holds the different retweet_count e.g 1,2,3,4,5,6 so we will sort it later
+        population = []  # this list is the same as count, but it holds only the values
+        bins = []  # bins, that show which numbers are shown in histogram
+        query_cursor = db_collection.find()  # make our query
+        for item in query_cursor:
+            retweets = item["retweet_count"]  # get the int
+            # this is because, I found 205 retweets happened in ~600 tweets (just visual)
+            if retweets is not 205:
+                population.append(retweets)  # we must have the whole population e.g [0,0,0,4,5,0...]
+                if str(retweets) not in count:  # here we build the count dict - if there is no previous entry
+                    count[str(retweets)] = 1  # make one with the retweet int as key
+                    olist.append(retweets)  # but we need to sort it later (we need only keys in this list)
+                else:
+                    count[str(retweets)] += 1
+        olist.sort()
+        # this is again for visual (ignore it)
+        counter = 0
+        while counter <= 29:
+            population.append(205)
+            counter += 1
+
+        low = 1000000  # a big integer, with this, we find where the bins start
+        for key in olist:
+            # with this, we show the values that are between 15 and 600 (visual again)
+            if 15 < count[str(key)] < 600:
+                print(str(key) + " retweets: " + str(count[str(key)]))
+                if key < low:  # we must find the lowest number to start for the bins
+                    low = key
+        while low <= 1132:
+            bins.append(low)  # we build the bins to hold all values between the low, and a random number (visual again)
+            low += 1
+
+        print(str(len(bins)))
+        print(str(len(population)))
+
+        plt.hist(population, bins, color='green')
+        plt.xlabel("Retweets count")
+        plt.title("Retweet count distribution")
+        plt.show()
+
+    retweets_map_btn = Button(stats_frame, text="Calculate Retweets", command=calculate_retweets_map)
+    retweets_map_btn.grid(row=5, column=2, columnspan=2, pady=10)
+
     root.mainloop()

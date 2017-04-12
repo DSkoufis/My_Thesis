@@ -7,4 +7,6 @@ credentials.txt
 Help/
 Help/Utilities/
 Help/ebook/
-mongo.json
+Help/matplotlib/
+/mongo.json
+/TODOs.py
