@@ -10,28 +10,17 @@ data analysis by applying some filters.
 
 # SPECS:
 
-To be able to run this program there are some TO-DOs.
+To be able to run this program there are some TO-DOs:
 
 First you must make a Twitter account and then create an app from https://apps.twitter.com/
 and find your API key (consumer key) and API secret along with Access Token and Access Token Secret.
 
-When you'll finish this, go to the project home folder (for example C:\path to folder\My_Thesis\) and create a
-text file with name <credentials.txt>.
+When finished, go to ../My_Thesis/Ufiles/credentials.json and open it with a text editor like Notepad++. Complete your newly acquired 
+credentials, as names state. 
 
-Add the following into the newly created text file:
+Secondly, make sure you have installed Python3.5. There are some dependencies for this project to run, but I will add a requirements file
+in a later stage.
 
------------------------------------------
-consumer_key:
-
-consumer_secret:
-
-access_token:
-
-access_token_secret:
-
------------------------------------------
-
-and after the ":" complete your personal credentials.
 
 # IMPORTANT:
 
