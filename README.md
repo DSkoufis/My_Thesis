@@ -18,8 +18,8 @@ and find your API key (consumer key) and API secret along with Access Token and 
 When finished, go to ../My_Thesis/Ufiles/credentials.json and open it with a text editor like Notepad++. Complete your newly acquired 
 credentials, as names state. 
 
-Secondly, make sure you have installed Python3.5. There are some dependencies for this project to run, but I will add a requirements file
-in a later stage.
+Secondly, make sure you have installed Python3.5 & MongoDB (I use 3.4). There are some dependencies for this project to run, but I will
+add a requirements file in a later stage.
 
 
 # IMPORTANT:
