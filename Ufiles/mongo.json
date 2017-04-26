@@ -1,0 +1,20 @@
+[
+  {
+    "collection": "ss",
+    "database": "test",
+    "host": "192.168.1.254",
+    "port": 270
+  },
+  {
+    "collection": "ss",
+    "database": "test",
+    "host": "192.578",
+    "port": 27018
+  },
+  {
+    "collection": "ss",
+    "database": "test",
+    "host": "localhost",
+    "port": 27017
+  }
+]

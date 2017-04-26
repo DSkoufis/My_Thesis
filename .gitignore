@@ -1,12 +1,5 @@
-*.iml
-/.idea/workspace.xml
-/.idea/inspectionProfiles
 .idea/
-/.idea/inspectionProfiles/profiles_settings.xml
-credentials.txt
-Help/
-Help/Utilities/
-Help/ebook/
-Help/matplotlib/
-/mongo.json
-/TODOs.py
+initial
+Help
+tests
+TODOs.py
