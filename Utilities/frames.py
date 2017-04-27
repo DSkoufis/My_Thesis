@@ -4,7 +4,7 @@
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox
-from Utilities import read_write, db_utils, stream_util, search_util
+from Utilities import read_write, db_utils, stream_util, search_util, graph_utils
 from pymongo import DESCENDING
 
 LOG_NAME = "--> frames.py"
@@ -444,8 +444,10 @@ class StatsFrame(Frame):
 
         quick_facts_frm = Frame(self)
         quick_facts_frm.grid(row=0, column=0, pady=10)
+        show_graphs_frm = Frame(self)
+        show_graphs_frm.grid(row=1, column=0, pady=10)
         exit_frm = Frame(self)
-        exit_frm.grid(row=1, column=0, pady=10)
+        exit_frm.grid(row=2, column=0, pady=10)
 
         Label(quick_facts_frm, text="Total unique tweets stored:").grid(row=0, column=0, padx=10, pady=2, sticky=W)
         tweets_sum = all_documents.count()
@@ -484,6 +486,11 @@ class StatsFrame(Frame):
             # showing the most statuses by a user
             Label(quick_facts_frm, text="Most statuses by a user:").grid(row=4, column=0, padx=10, pady=2, sticky=W)
             Label(quick_facts_frm, text=str(max_counter)).grid(row=4, column=2, pady=2, sticky=W)
+
+        # build the widgets for show_graphs_frm
+        self.letters_distro_btn = Button(show_graphs_frm, text="Letters Distribution Graph",
+                                         command=graph_utils.show_letter_distro)
+        self.letters_distro_btn.grid(row=0, column=1, pady=10, ipadx=5)
 
         # Build the widgets for exit_frm
         self.back_btn = Button(exit_frm, text="Back")

@@ -24,7 +24,9 @@ class StdOutListener(StreamListener):
               + stream_controller.search_keyword + "' keyword. ####")
         self.store_counter = 0  # initialize the counter
         # and save the keyword to the keywords.json file
-        read_write.write_keywords(stream_controller.search_keyword)
+        keywords_list = [x.strip() for x in stream_controller.search_keyword.split(",")]
+        for keyword in keywords_list:
+            read_write.write_keywords(keyword)
 
     def on_data(self, data):
         if self.flag:  # flag keep track if we want to stop the stream
@@ -75,11 +77,19 @@ class StdOutListener(StreamListener):
         # clearing the text of a tweet into two lists
         text = other_utils.clear_text(tweet["text"])
 
+        # check if this tweet is a retweet
+        if "rt" in text["stop_words"]:
+            is_retweet = True
+        else:
+            is_retweet = False
+
         formatted_tweet = {"created_at": datetime.strptime(tweet["created_at"], "%a %b %d %H:%M:%S %z %Y"),
                            "favourite_count": tweet["favorite_count"],
                            "_id": tweet["id"],  # this will make the tweet's id, ObjectID
                            "retweet_count": tweet["retweet_count"],
                            "coordinates": tweet["coordinates"],
+                           "timestamp": other_utils.get_timestamp(),
+                           "is_retweet": is_retweet,
                            "text": text,
                            "whole_text": tweet["text"],
                            "user": {
@@ -128,8 +138,12 @@ class StreamController(object):
         # this is a try-except block, because if there is something wrong in the Listener class,
         # like e.g internet connection failure, it raises the exception inside the active thread
         try:
+            # user can give more than one keywords for searching, we just add them to a list
+            # he must separate them with commas, so we can split them and remove the whitespace with strip
+            search_list = [x.strip() for x in self.search_keyword.split(",")]
+
             print(LOG_NAME + " :: Trying to connect to the Streaming Server...")
-            stream.filter(track=[self.search_keyword],
+            stream.filter(track=search_list,
                           async=True)  # start the loop, async sets the Streaming in a new Thread
         except Exception as e:
             print(LOG_NAME + " :: ERROR :: " + str(repr(e)))

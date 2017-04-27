@@ -1,5 +1,9 @@
+#####################################################################################################
+# Module that is responsible to some useful functionality into the project like text tokenizing etc #
+#####################################################################################################
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from datetime import datetime
 import string
 import re
 
@@ -31,7 +35,7 @@ def clear_text(text):
     words = []  # this list holds all the meaningful words
     stop_words = []  # this list holds all the stop words
     punctuations = []  # this list holds all the punctuation marks
-    characters_map = {}  # this dictionary will hold how many times each character appears in the tweet
+    characters_map = []  # this dictionary will hold how many times each character appears in the tweet
     entities = []  # this list holds all mentions, hastags and urls
 
     # tokenize the text into a list
@@ -76,15 +80,39 @@ def clear_text(text):
     return response
 
 
-# function that maps into a dictionary all the characters of a tweet, for later reference
-def map_characters(text, map_):
-    for char in text:
-        if char in alphabet:
-            if char in map_:
-                map_[char] += 1
-            else:
-                map_[char] = 1
-    return map_
+# function that maps into a list all the characters of a tweet, for later reference
+# format is like: [ { "char" : "a", "value" : 4 }. { "char" : "b", "value" : 3 }, ... ]
+# because this is better if we want to group them later
+def map_characters(word, a_list):
+    # this is a little complicated, so let's take it slowly
+    # we create a dictionary, which will hold our characters
+    # in format like { "a": 1, "b":4, ...}
+    temp_dict = {}
+
+    # we iterate through the word characters
+    for char in word:
+        if char in alphabet:  # and if this character is from the alphabet
+            if char in temp_dict:  # and if this character already exists in this
+                # temp dictionary, we increase it's value by 1
+                temp_dict[char] += 1
+            else:  # else, it is a new value,
+                # so, add a new key, with value of 1
+                temp_dict[char] = 1
+
+    # now to get the format we want, we iterate through the keys
+    for key in temp_dict:
+        # and if we don't find the key, in any index of the list (remember how the list looks like?)
+        if not any(d["char"] == key for d in a_list):
+            # we create a new entry
+            in_value = {"char": key, "value": temp_dict[key]}
+            a_list.append(in_value)  # and add it to the list
+        else:  # else if key already exists in the list
+            for value in a_list:  # find it
+                if value["char"] is key:  # and add 1 to it's value field
+                    value["value"] += 1
+                    break
+
+    return a_list
 
 
 # function that re-builds the tokens list, because some words are not acceptable by word_tokenizer of NLTK
@@ -132,3 +160,11 @@ def re_build_text(text):
         counter += 1
 
     return text
+
+
+# function that returns the current datetime. I do it here, because this is needed in
+# search and stream utils
+def get_timestamp():
+    now = datetime.now()
+    now = now.replace(microsecond=0)
+    return now

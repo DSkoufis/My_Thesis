@@ -104,8 +104,9 @@ class SearchController(object):
                            "retweet_count": tweet.retweet_count,
                            "text": cleared_text,
                            "whole_text": tweet.text,
-                           "retweet": is_retweet,
+                           "is_retweet": is_retweet,
                            "coordinates": tweet.coordinates,
+                           "timestamp": other_utils.get_timestamp(),
                            "user": {
                                "favourites_count": tweet.user.favourites_count,
                                "followers_count": tweet.user.followers_count,
