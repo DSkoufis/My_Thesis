@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from Utilities import db_utils, other_utils
+from operator import itemgetter
 
 
 # this function shows a distribution of collected letters
-def show_letter_distro():
+def show_letter_distribution():
     collection = db_utils.get_collection()
 
     # this is what we request from the MongoDB, we use the aggregation framework
@@ -44,4 +45,51 @@ def show_letter_distro():
 
     plt.xticks(x, my_xticks)
     plt.plot(x, y)
+    plt.show()
+
+
+# this function shows a plot, with the time zones in the x axis and the number of tweets of each time zone in y axis
+# @param more_than, a value that indicates from which value and above we keep our results
+# @param less_than, a value that indicates from which value and downwards we keep our results
+# @param exclude_list, a list which holds all time zones values, that the user wants to exclude from the final graph
+def show_tz_distribution(more_than, less_than, exclude_list):
+    collection = db_utils.get_collection()
+
+    # this is what we request from the MongoDB, we use the aggregation framework
+    pipeline = [{"$unwind": "$user.time_zone"},
+                {"$group": {"_id": "$user.time_zone",
+                            "sum": {"$sum": 1}
+                            }
+                 }]
+
+    results = collection.aggregate(pipeline)  # we get the cursor from the database
+
+    # in here we store all results, because PyMongo returns us a cursor
+    all_results_list = []
+
+    for item in results:
+        # the results from the aggregation are in the format: [{"_id": "time zone name", "sum": 208"}, ... ]
+        # with this for, we store all data in the all_results dictionary like above,
+        # because we need a list, to be able to sort our data
+        # we must clear the data, if user applied filter in here
+        if item["_id"] not in exclude_list:
+            if item["sum"] > more_than:
+                if item["sum"] < less_than:
+                    all_results_list.append(item)
+
+    # sort the list by sum number in descending order
+    all_results_sorted = sorted(all_results_list, key=itemgetter("sum"), reverse=True)
+
+    time_zones = []  # this list holds all time zones after the sorting
+    values = []  # this list holds all sum values of each time zone after the sorting
+    for item in all_results_sorted:
+        time_zones.append(item["_id"])
+        values.append(item["sum"])
+
+    y_pos = np.arange(len(time_zones))
+
+    plt.bar(y_pos, values, color='r', align='center', alpha=0.5)
+    plt.xticks(y_pos, time_zones, rotation=45)  # rotate the strings 45 degrees
+    plt.ylabel("Number of tweets")
+    plt.title("Number of tweets per time zone")
     plt.show()

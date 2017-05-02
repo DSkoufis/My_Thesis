@@ -4,7 +4,7 @@
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox
-from Utilities import read_write, db_utils, stream_util, search_util, graph_utils
+from Utilities import read_write, db_utils, stream_util, search_util, graph_utils, stats_utils
 from pymongo import DESCENDING
 
 LOG_NAME = "--> frames.py"
@@ -453,44 +453,63 @@ class StatsFrame(Frame):
         tweets_sum = all_documents.count()
         Label(quick_facts_frm, text=str(tweets_sum)).grid(row=0, column=2, pady=2, sticky=W)
 
-        # the rest of the "quick facts" will only be shown, only if db's size is smaller than 100.000 documents
-        # otherwise, they will not be so "quick"!!
-        if tweets_sum <= 100000:
-            # iterate the cursor once here and find all values you want
-            unique_users = []  # how many unique users we have
-            max_counter = 0  # the most statuses count from a user
+        # if we use a collection with no stored tweets, we do not show any data or metric
+        if tweets_sum > 0:
 
-            for item in all_documents:  # for all items in the db
-                if item["user"]["id_str"] not in unique_users:  # check the user.id_str
-                    unique_users.append(item["user"]["id_str"])
-                if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
-                    max_counter = item["user"]["statuses_count"]
-            users_sum = len(unique_users)
+            Label(quick_facts_frm, text="Number of entries that\nare retweets:").grid(row=1, column=0, padx=10, pady=2,
+                                                                                      sticky=W)
+            number_of_retweets = self.collection.find({"is_retweet": True}).count()
+            Label(quick_facts_frm, text=str(number_of_retweets)).grid(row=1, column=2, pady=2, sticky=W)
 
-            # showing the number of unique users
-            Label(quick_facts_frm, text="Number of unique users:").grid(row=1, column=0, padx=10, pady=2, sticky=W)
+            # the rest of the "quick facts" will only be shown, only if db's size is smaller than 100.000 documents
+            # otherwise, they will not be so "quick"!!
+            if tweets_sum <= 100000:
+                # iterate the cursor once here and find all values you want
+                unique_users = []  # how many unique users we have
+                max_counter = 0  # the most statuses count from a user
 
-            Label(quick_facts_frm, text=str(users_sum)).grid(row=1, column=2, pady=2, sticky=W)
+                for item in all_documents:  # for all items in the db
+                    if item["user"]["id_str"] not in unique_users:  # check the user.id_str
+                        unique_users.append(item["user"]["id_str"])
+                    if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
+                        max_counter = item["user"]["statuses_count"]
+                users_sum = len(unique_users)
 
-            # showing the number of verified users
-            Label(quick_facts_frm, text="Verified users:").grid(row=2, column=0, padx=10, pady=2, sticky=W)
-            verified_users_sum = self.collection.find(filter={"user.verified": True}).count()
-            Label(quick_facts_frm, text=str(verified_users_sum)).grid(row=2, column=2, pady=2, sticky=W)
+                # showing the number of unique users
+                Label(quick_facts_frm, text="Number of unique users:").grid(row=2, column=0, padx=10, pady=2, sticky=W)
+                Label(quick_facts_frm, text=str(users_sum)).grid(row=2, column=2, pady=2, sticky=W)
 
-            # showing the oldest tweet
-            Label(quick_facts_frm, text="Oldest created tweet:").grid(row=3, column=0, padx=10, pady=2, sticky=W)
-            oldest_tweet_cursor = self.collection.find().sort("created_at", DESCENDING).limit(1)
-            oldest_tweet = [item["created_at"] for item in oldest_tweet_cursor]
-            Label(quick_facts_frm, text=oldest_tweet).grid(row=3, column=2, pady=2, sticky=W)
+                # showing the number of verified users
+                Label(quick_facts_frm, text="Verified users:").grid(row=3, column=0, padx=10, pady=2, sticky=W)
+                verified_users_sum = self.collection.find(filter={"user.verified": True}).count()
+                Label(quick_facts_frm, text=str(verified_users_sum)).grid(row=3, column=2, pady=2, sticky=W)
 
-            # showing the most statuses by a user
-            Label(quick_facts_frm, text="Most statuses by a user:").grid(row=4, column=0, padx=10, pady=2, sticky=W)
-            Label(quick_facts_frm, text=str(max_counter)).grid(row=4, column=2, pady=2, sticky=W)
+                # showing the oldest tweet
+                Label(quick_facts_frm, text="Oldest created tweet\nstored in the database:").grid(row=4, column=0,
+                                                                                                  padx=10, pady=2,
+                                                                                                  sticky=W)
+                oldest_tweet_cursor = self.collection.find().sort("created_at", DESCENDING).limit(1)
+                oldest_tweet = [item["created_at"] for item in oldest_tweet_cursor]
+                Label(quick_facts_frm, text=oldest_tweet).grid(row=4, column=2, pady=2, sticky=W)
 
-        # build the widgets for show_graphs_frm
-        self.letters_distro_btn = Button(show_graphs_frm, text="Letters Distribution Graph",
-                                         command=graph_utils.show_letter_distro)
-        self.letters_distro_btn.grid(row=0, column=1, pady=10, ipadx=5)
+                # showing the most statuses by a user
+                Label(quick_facts_frm, text="Most statuses by a user:").grid(row=5, column=0, padx=10, pady=2, sticky=W)
+                Label(quick_facts_frm, text=str(max_counter)).grid(row=5, column=2, pady=2, sticky=W)
+
+            # build the widgets for show_graphs_frm
+            # letters distribution graph
+            self.letters_distro_btn = Button(show_graphs_frm, text="Letters Distribution Graph",
+                                             command=graph_utils.show_letter_distribution)
+            self.letters_distro_btn.grid(row=0, column=1, pady=10, ipadx=5)
+
+            # tweets per time zone graph (we open a new Toplevel window, to apply some filters
+            self.tweets_per_tz_btn = Button(show_graphs_frm, text="Tweets per Time Zone Graph",
+                                            command=lambda: stats_utils.show_tweets_per_tz_graph(self.root))
+            self.tweets_per_tz_btn.grid(row=1, column=1, pady=10, ipadx=5)
+        else:  # if we have an empty collection
+            message = "No documents found in this collection.\n"
+            message += "Please enter some data first."
+            Label(quick_facts_frm, text=message).grid(row=1, column=0, padx=10, pady=5)
 
         # Build the widgets for exit_frm
         self.back_btn = Button(exit_frm, text="Back")
