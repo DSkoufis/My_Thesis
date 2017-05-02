@@ -8,3 +8,5 @@
 # TODO: Make a script to validate and store credentials
 
 # TODO: Check if credentials are OK, when stream or search button is pressed from each menu
+
+# TODO: Need to take care if user gives as keyword two words in one stream search, to not strip the whitespaces between words
