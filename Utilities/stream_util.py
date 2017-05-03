@@ -24,8 +24,10 @@ class StdOutListener(StreamListener):
               + stream_controller.search_keyword + "' keyword. ####")
         self.store_counter = 0  # initialize the counter
         # and save the keyword to the keywords.json file
-        keywords_list = [x.strip() for x in stream_controller.search_keyword.split(",")]
+        keywords_list = [x for x in stream_controller.search_keyword.split(",")]
         for keyword in keywords_list:
+            keyword = keyword.lstrip()
+            keyword = keyword.rstrip()
             read_write.write_keywords(keyword)
 
     def on_data(self, data):
@@ -57,8 +59,29 @@ class StdOutListener(StreamListener):
         return True
 
     def on_error(self, status):
-        # TODO: here I can make a better logging system, to print the HTTP non-200 codes
-        print(status)
+        # statuses take from here:
+        # https://dev.twitter.com/overview/api/response-codes
+        if status == 401:
+            print(LOG_NAME + " :: HTTP_ERROR :: 401 Unauthorized - Missing or incorrect authentication credentials.")
+        elif status == 304:
+            print(LOG_NAME + " :: HTTP_ERROR :: 304 Not Modified - There was no new data to return.")
+        elif status == 403:
+            print(LOG_NAME + " :: HTTP_ERROR :: 403 Forbidden - The request is understood, " +
+                  "but it has been refused or access is not allowed.")
+        elif status == 420:
+            print(LOG_NAME + " :: HTTP_ERROR :: 420 Enhance Your Calm - Returned when you are being rate limited.")
+        elif status == 500:
+            print(LOG_NAME + " :: HTTP_ERROR :: 500 Internal Server Error - Something is broken.")
+        elif status == 503:
+            print(LOG_NAME + " :: HTTP_ERROR :: 503 Service Unavailable - The Twitter servers are up, " +
+                  "but overloaded with requests. Try again later.")
+        elif status == 504:
+            print(LOG_NAME + " :: HTTP_ERROR :: 504 Gateway timeout - The Twitter servers are up, but " +
+                  "the request couldn’t be serviced due to some failure within our stack. Try again later.")
+        else:
+            print(LOG_NAME + " :: HTTP_ERROR :: " + status + " Unknown.")
+
+        return False  # and stop the stream
 
     def on_disconnect(self, notice):
         status = json.loads(notice)
@@ -142,7 +165,7 @@ class StreamController(object):
             # he must separate them with commas, so we can split them and remove the whitespace with strip
             search_list = [x.strip() for x in self.search_keyword.split(",")]
 
-            print(LOG_NAME + " :: Trying to connect to the Streaming Server...")
+            print(LOG_NAME + " :: INFO :: Trying to connect to the Streaming Server...")
             stream.filter(track=search_list,
                           async=True)  # start the loop, async sets the Streaming in a new Thread
         except Exception as e:
