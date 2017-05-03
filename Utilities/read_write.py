@@ -11,29 +11,45 @@ file_path = os.path.abspath("Ufiles")
 
 # function that returns the data in json format from mongo.json file
 def read_mongo():
-    with open(os.path.abspath(file_path + "/mongo.json")) as datafile:
-        data = json.load(datafile)
+    try:
+        with open(os.path.abspath(file_path + "/mongo.json")) as datafile:
+            data = json.load(datafile)
+    except FileNotFoundError as fe:
+        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        data = []
     return data
 
 
 # function that returns the data in json format from last.json file
 def read_last():
-    with open(os.path.abspath(file_path + "/last.json")) as datafile:
-        data = json.load(datafile)
+    try:
+        with open(os.path.abspath(file_path + "/last.json")) as datafile:
+            data = json.load(datafile)
+    except FileNotFoundError as fe:
+        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        data = {}
     return data
 
 
 # function that reads and returns the data from keywords.json file
 def read_keywords():
-    with open(os.path.abspath(file_path + "/keywords.json")) as datafile:
-        data = json.load(datafile)
+    try:
+        with open(os.path.abspath(file_path + "/keywords.json")) as datafile:
+            data = json.load(datafile)
+    except FileNotFoundError as fe:
+        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        data = []
     return data
 
 
 # function that read credentials from credentials.json
 def read_credentials():
-    with open(os.path.abspath(file_path + "/credentials.json")) as datafile:
-        credentials = json.load(datafile)
+    try:
+        with open(os.path.abspath(file_path + "/credentials.json")) as datafile:
+            credentials = json.load(datafile)
+    except FileNotFoundError as fe:
+        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        credentials = {}
     return credentials
 
 

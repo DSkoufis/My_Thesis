@@ -76,7 +76,7 @@ class SearchController(object):
                 print(LOG_NAME + " :: ERROR :: " + str(error))  # we log the error
                 break
             except AttributeError as e:
-                print(LOG_NAME + " :: ERROR :: " + str(e) + "\n" + LOG_NAME + " :: REASON :: Network connection error")
+                print(LOG_NAME + " :: ERROR :: " + str(e) + "\n" + LOG_NAME + " :: REASON :: Can't connect to server.")
                 break
         print("Search stopped successfully.")
 

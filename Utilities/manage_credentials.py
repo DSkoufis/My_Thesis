@@ -10,8 +10,13 @@ LOG_NAME = "--> manage_credentials.py"
 def get_stream(listener):
     credentials = read_write.read_credentials()
 
-    auth = OAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
-    auth.set_access_token(credentials["access_token"], credentials["access_token_secret"])
+    try:
+        auth = OAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
+        auth.set_access_token(credentials["access_token"], credentials["access_token_secret"])
+    except KeyError as error:
+        print(LOG_NAME + " :: ERROR :: " + str(error))
+        print(LOG_NAME + " :: FATAL :: Error on credentials. Please check the credentials.json file.")
+        return None
 
     stream = Stream(auth, listener)  # and we setting the stream item
     return stream

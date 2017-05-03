@@ -7,10 +7,17 @@
 
 # TODO: Make a script to validate and store credentials
 
-# TODO: Check if credentials are OK, when stream or search button is pressed from each menu
+# TODO: Make a word graph
+"""
+pipeline = db.ss.aggregate([{$unwind : "$text.words"}, 
+                            { $group : 
+                                { "_id" : "$text.words.value", 
+                                        "counter" : { $sum : 1 } 
+                                }
+                            }
+                           ])
+                           
+results : { "_id" : "appreciate", "counter" : 1 }
+"""
 
-# TODO: Need to take care if user gives as keyword two words in one stream search, to not strip the whitespaces between words
-
-# TODO: Take care of exception if a file from Ufile does not exist
-
-# TODO: Take care of exception if a file from Ufile is not well formatted
+# TODO: Make a window, which prints all tweets with the given keyword (user gives it)
