@@ -52,7 +52,7 @@ def show_letter_distribution():
 # @param more_than, a value that indicates from which value and above we keep our results
 # @param less_than, a value that indicates from which value and downwards we keep our results
 # @param exclude_list, a list which holds all time zones values, that the user wants to exclude from the final graph
-def show_tz_distribution(more_than, less_than, exclude_list):
+def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, include_list):
     collection = db_utils.get_collection()
 
     # this is what we request from the MongoDB, we use the aggregation framework
@@ -72,10 +72,16 @@ def show_tz_distribution(more_than, less_than, exclude_list):
         # with this for, we store all data in the all_results dictionary like above,
         # because we need a list, to be able to sort our data
         # we must clear the data, if user applied filter in here
+        # so if item is in exclude list, do not calculate anythin
         if item["_id"] not in exclude_list:
-            if item["sum"] > more_than:
-                if item["sum"] < less_than:
-                    all_results_list.append(item)
+            # but if it is not in exclude list, check if it is in include list
+            # before clear it with more_than and less_than borders
+            if item["_id"] in include_list:
+                all_results_list.append(item)
+            else:
+                if item["sum"] > exclude_less_than:
+                    if item["sum"] < exclude_more_than:
+                        all_results_list.append(item)
 
     # sort the list by sum number in descending order
     all_results_sorted = sorted(all_results_list, key=itemgetter("sum"), reverse=True)
