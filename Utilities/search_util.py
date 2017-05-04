@@ -88,7 +88,7 @@ class SearchController(object):
         cleared_text = other_utils.clear_text(tweet.text)
 
         # check if this tweet is a retweet
-        if "RT" in cleared_text["stop_words"]:
+        if "rt" in cleared_text["stop_words"]:
             is_retweet = True
         else:
             is_retweet = False
