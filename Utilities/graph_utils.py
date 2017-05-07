@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
 import numpy as np
 from Utilities import db_utils, other_utils
 from operator import itemgetter
@@ -98,4 +99,40 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
     plt.xticks(y_pos, time_zones, rotation=45)  # rotate the strings 45 degrees
     plt.ylabel("Number of tweets")
     plt.title("Number of tweets per time zone")
+    plt.show()
+
+
+# this functions, queries the DB and gets all the documents that has as 'coordinates' field != null. It creates a
+# map, using the Basemap extension library and it paints in every location a point which represents the coordinate
+# of each tweet, according to the Twitter response.
+def show_coordinates_map():
+    collection = db_utils.get_collection()
+
+    # we query the db and get the results
+    results = collection.find({"coordinates.coordinates":
+                                   {"$ne": None}
+                               },
+                              {"coordinates": 1,
+                               "_id": 0})
+
+    # creating the map
+    m = Basemap(projection='mill',
+                llcrnrlat=-90,
+                llcrnrlon=-180,
+                urcrnrlat=90,
+                urcrnrlon=180,
+                resolution='c')
+
+    m.drawcoastlines(linewidth=1)
+    m.drawcountries(linewidth=0.5)
+
+    # we iterate with the cursor and we save every element on the plot
+    for coordinate in results:
+        lon = coordinate["coordinates"]["coordinates"][0]  # we need longitude
+        lat = coordinate["coordinates"]["coordinates"][1]  # and latitude
+        xpt, ypt = m(lon, lat)
+        m.plot(xpt, ypt, 'ro', markersize=2)  # and we create the point on the map
+
+    sample_sum = str(results.count())
+    plt.title("Results of " + sample_sum + " tweets sample.")
     plt.show()
