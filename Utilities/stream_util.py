@@ -168,6 +168,10 @@ class StreamController(object):
             print(LOG_NAME + " :: INFO :: Trying to connect to the Streaming Server...")
             stream.filter(track=search_list,
                           async=True)  # start the loop, async sets the Streaming in a new Thread
+        except AttributeError as e:
+            print(LOG_NAME + " :: ERROR :: " + str(e))
+            messagebox.showerror("Fatal error", "No credentials were found. Please close the script, " +
+                                 "add the file and try again!")
         except Exception as e:
             print(LOG_NAME + " :: ERROR :: " + str(repr(e)))
             pass
