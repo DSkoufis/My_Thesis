@@ -21,3 +21,5 @@ results : { "_id" : "appreciate", "counter" : 1 }
 """
 
 # TODO: Make a window, which prints all tweets with the given keyword (user gives it)
+
+# TODO: Make stream and search log messages, printed on a toplevel window
