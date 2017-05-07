@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from Utilities import *
+import os
 
 # variable that helps on logging
 LOG_NAME = "--> main.py"
@@ -170,6 +171,8 @@ def main():
     host_selection.next_btn.config(command=lambda: goto_db_frame(root=root, frame=host_selection))
     host_selection.pack()
 
+    # add a favicon
+    read_write.set_favicon(root)
     root.mainloop()
 
 

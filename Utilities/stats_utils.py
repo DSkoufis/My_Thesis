@@ -5,7 +5,7 @@
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox
-from Utilities import graph_utils
+from Utilities import graph_utils, read_write
 
 LOG_NAME = "--> stats_util.py"
 
@@ -15,6 +15,7 @@ def show_tweets_per_tz_graph(root):
     # we start the toplevel
     top_level = Toplevel(root)
     top_level.minsize(400, 200)
+    read_write.set_favicon(top_level)
     top_level.title("-- Twitter API --  time zones graph")
 
     # in this we will have a labelframe

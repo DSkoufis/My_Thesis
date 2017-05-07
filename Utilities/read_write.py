@@ -78,3 +78,7 @@ def write_keywords(data):
     with open(os.path.abspath(file_path + "/keywords.json"), "w") as outfile:
         json.dump(keywords, outfile, sort_keys=False, indent=2)
 
+
+# function that gets as argument a window and sets a favicon to it
+def set_favicon(root):
+    root.iconbitmap(os.path.abspath("favicon.ico"))
