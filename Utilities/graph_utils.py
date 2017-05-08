@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import numpy as np
-from Utilities import db_utils, other_utils
+from Utilities import db_utils, other_utils, read_write
 from operator import itemgetter
+
+LOG_NAME = "--> graph_util.py"
 
 
 # this function shows a distribution of collected letters
@@ -95,6 +97,8 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
 
     y_pos = np.arange(len(time_zones))
 
+    read_write.log_message(LOG_NAME + " (TZ Graph) :: INFO :: Sample sum: " + str(len(time_zones)))
+
     plt.bar(y_pos, values, color='r', align='center', alpha=0.5)
     plt.xticks(y_pos, time_zones, rotation=45)  # rotate the strings 45 degrees
     plt.ylabel("Number of tweets")
@@ -134,6 +138,7 @@ def show_coordinates_map():
         m.plot(xpt, ypt, 'ro', markersize=2)  # and we create the point on the map
 
     sample_sum = str(results.count())
+    read_write.log_message(LOG_NAME + " (Map Graph) :: INFO :: Sample sum: " + sample_sum)
     plt.title("Results of " + sample_sum + " tweets sample.")
     plt.show()
 
@@ -180,6 +185,8 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
         values.append(word["counter"])
 
     y_pos = np.arange(len(all_words))
+
+    read_write.log_message(LOG_NAME + " (Words Graph) :: INFO :: Sample sum: " + str(len(all_words)))
 
     plt.bar(y_pos, values, color='g', align='center', alpha=0.5)
     plt.xticks(y_pos, all_words, rotation=45)  # rotate the strings 45 degrees

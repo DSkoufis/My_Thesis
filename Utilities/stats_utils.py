@@ -70,8 +70,10 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # else try to convert the value into string
             more_than_value = int(exclude_more_than_str)
         except ValueError as ve:
+            message = LOG_NAME + " (TZ Graph) :: ERROR :: " + str(ve)
             # and if not succeed, inform the user
-            print(LOG_NAME + " :: ERROR :: " + str(ve))  # we log the error
+            print(message)  # we log the error
+            read_write.log_message(message)
             messagebox.showerror("Error", "'More than' value must be an integer number!")
             return
 
@@ -83,14 +85,18 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # else try to convert the value into string
             less_than_value = int(exclude_less_than_str)
         except ValueError as ve:
+            message = LOG_NAME + " (TZ Graph) :: ERROR :: " + str(ve)
             # and if not succeed, inform the user
-            print(LOG_NAME + " :: ERROR :: " + str(ve))  # we log the error
+            print(message)  # we log the error
+            read_write.log_message(message)
             messagebox.showerror("Error", "'Less than' value must be an integer number!")
             return
 
     # if exclude values are set wrong, return the error
     if more_than_value < less_than_value:
-        print(LOG_NAME + " :: ERROR :: " + "Values are set wrong.")
+        message = LOG_NAME + " (TZ Graph) :: ERROR :: " + "Values are set wrong."
+        print(message)
+        read_write.log_message(message)
         messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.")
         return
 
@@ -191,8 +197,10 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # else try to convert the value into string
             more_than_value = int(exclude_more_than_str)
         except ValueError as ve:
+            message = LOG_NAME + " (Words Graph) :: ERROR :: " + str(ve)
             # and if not succeed, inform the user
-            print(LOG_NAME + " :: ERROR :: " + str(ve))  # we log the error
+            print(message)  # we log the error
+            read_write.log_message(message)
             messagebox.showerror("Error", "'More than' value must be an integer number!")
             return
 
@@ -204,14 +212,18 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # else try to convert the value into string
             less_than_value = int(exclude_less_than_str)
         except ValueError as ve:
+            message = LOG_NAME + " (Words Graph) :: ERROR :: " + str(ve)
             # and if not succeed, inform the user
-            print(LOG_NAME + " :: ERROR :: " + str(ve))  # we log the error
+            print(message)  # we log the error
+            read_write.log_message(message)
             messagebox.showerror("Error", "'Less than' value must be an integer number!")
             return
 
     # if exclude values are set wrong, return the error
     if more_than_value < less_than_value:
-        print(LOG_NAME + " :: ERROR :: " + "Values are set wrong.")
+        message = LOG_NAME + " (Words Graph) :: ERROR :: " + "Values are set wrong."
+        print(message)
+        read_write.log_message(message)
         messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.")
         return
 

@@ -17,6 +17,7 @@ class SearchController(object):
         self.pause_search = False
 
         self.stop_thread = Event()
+        read_write.log_message(LOG_NAME + " :: INFO :: SearchController initialized")
 
     def combine(self):
         self.stop_thread.clear()
@@ -35,12 +36,15 @@ class SearchController(object):
         read_write.write_keywords(query)
 
         print("#### Gathering tweets for '" + query + "' keyword. ####")
+        read_write.log_message(LOG_NAME + " :: INFO :: #### Gathering tweets for '" + query + "' keyword. ####")
         tweets_per_query = 100  # how many tweets we can ask for
+        read_write.log_message(LOG_NAME + " :: INFO :: Tweets per query = " + str(tweets_per_query))
 
         since_ID = None
         max_ID = -1
 
         tweet_count = 0  # this shows how many tweets have stored already
+        ignored_count = 0
 
         while not self.stop_thread.is_set():
             if self.pause_search:  # if pause search have been set into True, we pause the search
@@ -67,17 +71,29 @@ class SearchController(object):
                     our_tweet = self.process_tweet(tweet)
                     if db_utils.store_tweet(our_tweet):
                         tweet_count += 1  # we count how many tweets we got
+                    else:
+                        ignored_count += 1
 
                 # logging some info into console
                 print("Saved {0} tweets till now".format(tweet_count))  # and we print them
 
                 max_ID = new_tweets[-1].id  # we need to re - set the max_ID for the new search query
             except TweepError as error:
-                print(LOG_NAME + " :: ERROR :: " + str(error))  # we log the error
+                message = LOG_NAME + " :: ERROR :: " + str(error)
+                print(message)  # we log the error
+                read_write.log_message(message)
                 break
             except AttributeError as e:
-                print(LOG_NAME + " :: ERROR :: " + str(e) + "\n" + LOG_NAME + " :: REASON :: Can't connect to server.")
+                message_1 = LOG_NAME + " :: ERROR :: " + str(e)
+                read_write.log_message(message_1)
+                message_2 = LOG_NAME + " :: REASON :: Can't connect to Twitter Server."
+                print(message_1 + "\n" + message_2)
+                read_write.log_message(message_2)
                 break
+        read_write.log_message(LOG_NAME + " :: INFO :: Search stopped successfully.")
+        message = LOG_NAME + " :: INFO :: Gathered " + str(tweet_count) + " tweets - Ignored "
+        message += str(ignored_count) + " tweets"
+        read_write.log_message(message)
         print("Search stopped successfully.")
 
     # in this method we keep only the values we need from our tweet
@@ -169,9 +185,11 @@ def pause_unpause(frame):
     global search_controller
     if search_controller.get_pause_flag():  # if flag is True, it means that we already paused the search
         search_controller.unpause()  # so un-pause it and change the GUI
+        read_write.log_message(LOG_NAME + " :: INFO :: Search unpaused...")
         frame.pause_search_btn.config(text="Pause Search")
     else:
         # but if it false, it means we press the Pause Search button, so set it accordingly
         search_controller.pause()
         frame.pause_search_btn.config(text="Continue Search")
+        read_write.log_message(LOG_NAME + " :: INFO :: Search paused...")
         print("Search paused...")

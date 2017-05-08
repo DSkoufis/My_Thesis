@@ -348,6 +348,7 @@ class StreamFrame(Frame):
                                 icon="question")
         if x:
             stream_util.stream_controller.stop()
+            read_write.log_message(stream_util.LOG_NAME + " :: INFO :: Exiting...")
             self.root.destroy()
 
 
@@ -431,6 +432,7 @@ class SearchFrame(Frame):
                                 icon="question")
         if x:
             search_util.search_controller.stop()
+            read_write.log_message(search_util.LOG_NAME + " :: INFO :: Exiting...")
             self.root.destroy()
 
 
@@ -451,6 +453,7 @@ class StatsFrame(Frame):
 
         Label(quick_facts_frm, text="Total unique tweets stored:").grid(row=0, column=0, padx=10, pady=2, sticky=W)
         tweets_sum = all_documents.count()
+        read_write.log_message(LOG_NAME + " (StatsFrame) :: INFO :: Found " + str(tweets_sum) + " tweets in the DB")
         Label(quick_facts_frm, text=str(tweets_sum)).grid(row=0, column=2, pady=2, sticky=W)
 
         # if we use a collection with no stored tweets, we do not show any data or metric
@@ -495,6 +498,9 @@ class StatsFrame(Frame):
                 # showing the most statuses by a user
                 Label(quick_facts_frm, text="Most statuses by a user:").grid(row=5, column=0, padx=10, pady=2, sticky=W)
                 Label(quick_facts_frm, text=str(max_counter)).grid(row=5, column=2, pady=2, sticky=W)
+            else:
+                read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
+                                       "100000 tweets in the DB. No 'Quick Facts' are shown")
 
             # build the widgets for show_graphs_frm
             # letters distribution graph
@@ -517,8 +523,9 @@ class StatsFrame(Frame):
                                           command=lambda: stats_utils.show_words_graph(self.root))
             self.words_graph_btn.grid(row=3, column=1, pady=10, ipadx=5)
         else:  # if we have an empty collection
-            message = "No documents found in this collection.\n"
-            message += "Please enter some data first."
+            message = "No documents found in this collection."
+            read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: " + message)
+            message += "\nPlease enter some data first."
             Label(quick_facts_frm, text=message).grid(row=1, column=0, padx=10, pady=5)
 
         # Build the widgets for exit_frm
@@ -531,4 +538,5 @@ class StatsFrame(Frame):
         x = messagebox.askyesno(title="Exit", message="Are you sure you want to exit?",
                                 icon="question")
         if x:
+            read_write.log_message(LOG_NAME + " (StatsFrame) :: INFO :: Exiting...")
             self.root.destroy()

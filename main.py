@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
 from Utilities import *
-import os
 
 # variable that helps on logging
 LOG_NAME = "--> main.py"
@@ -37,6 +36,7 @@ def goto_db_frame(root, frame):
                     found = True
                     read_write.write_last(entry)  # if found, add previous data, into last.json for later access
             if not found:  # and if not found, append it on the list
+                read_write.log_message(LOG_NAME + " :: INFO :: Connection not found on mongo.json, trying to add it.")
                 data.append({"host": host, "port": port})
                 read_write.write_mongo(data)
         else:
@@ -97,6 +97,8 @@ def goto_main_frame(root, frame):
 
         if db_validation is not None:
             if collection_validation is not None:
+                read_write.log_message(LOG_NAME + " :: INFO :: Using database: " +
+                                       database + " - collection: " + collection)
                 client = db_utils.get_client()
                 temp = client.address
                 host = temp[0]
@@ -125,11 +127,14 @@ def goto_main_frame(root, frame):
                 # these are all errors, but we try to find what causes the error
                 temp_collection = frame.collection_entry.get().strip(" ")
                 if temp_collection is "":
-                    print(LOG_NAME + " :: ERROR :: Collection field was blank.")
+                    message = LOG_NAME + " :: ERROR :: Collection field was blank."
+                    print(message)
+                    read_write.log_message(message)
                     messagebox.showerror(title="Error", message="Give a collection name to continue", parent=root)
                 else:
-
-                    print(LOG_NAME + " :: ERROR :: Invalid collection name.")
+                    message = LOG_NAME + " :: ERROR :: Invalid collection name."
+                    print(message)
+                    read_write.log_message(message)
                     messagebox.showerror(title="Error", parent=root,
                                          message="Collection's name must start with a letter!")
                 # if we found an error, we must exit this function
@@ -139,10 +144,14 @@ def goto_main_frame(root, frame):
             # these are all errors, but we try to find what causes the error
             temp_db = frame.db_entry.get().strip(" ")
             if temp_db is "":
-                print(LOG_NAME + " :: ERROR :: Database field was blank.")
+                message = LOG_NAME + " :: ERROR :: Database field was blank."
+                print(message)
+                read_write.log_message(message)
                 messagebox.showerror(title="Error", message="Give a database name to continue", parent=root)
             else:
-                print(LOG_NAME + " :: ERROR :: Invalid database name.")
+                message = LOG_NAME + " :: ERROR :: Invalid database name."
+                print(message)
+                read_write.log_message(message)
                 messagebox.showerror(title="Error", parent=root,
                                      message="Database's name must start with a letter or number!")
             # if we found an error, we must exit this function
@@ -179,4 +188,5 @@ def main():
 Program starts here
 '''
 if __name__ == '__main__':
+    read_write.log_message(LOG_NAME + " :: INFO :: Program starts")
     main()

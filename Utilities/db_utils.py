@@ -4,7 +4,7 @@
 from tkinter import messagebox
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError, ConfigurationError, DuplicateKeyError
-from Utilities import frames
+from Utilities import frames, read_write
 
 LOG_NAME = "--> db_utils.py"
 
@@ -20,18 +20,25 @@ def can_connect(frame):
             port = int(frame.port_entry.get())  # getting the port, if it is not an int, we will have en exception
         except ValueError as e:
             messagebox.showerror(title="Error", message="Port must be an integer", parent=frame.root)
-            print(LOG_NAME + " :: ERROR :: "+ str(e))
+            message = LOG_NAME + " :: ERROR :: " + str(e)
+            print(message)
+            read_write.log_message(message)
             return False
 
         try:  # try connect to the MongoDB
+            read_write.log_message(LOG_NAME + " :: INFO :: Trying to get client")
             connection = MongoClient(host=host, port=port, serverSelectionTimeoutMS=10000, tz_aware=True)
         except ConfigurationError as e:  # if host is not appropriate
             messagebox.showerror(title="Error", message=str(e), parent=frame.root)
-            print(LOG_NAME + " :: ERROR :: "+ str(e))
+            message = LOG_NAME + " :: ERROR :: " + str(e)
+            print(message)
+            read_write.log_message(message)
             return False
         except TypeError as e:  # if port result to an error
             messagebox.showerror(title="Error", message=str(e), parent=frame.root)
-            print(LOG_NAME + " :: ERROR :: " + str(e))
+            message = LOG_NAME + " :: ERROR :: " + str(e)
+            print(message)
+            read_write.log_message(message)
             return False
 
         # to see if we can connect to the MongoDB, we make a test query to see if we can write in it
@@ -39,10 +46,14 @@ def can_connect(frame):
         a_collection = a_db["a_name_that_no_one_ever_have_as_collection_name_1982465"]
 
         try:  # we give the client, 10 seconds to connect
+            read_write.log_message(LOG_NAME + " :: INFO :: Trying to connect to MongoDB with host: " +
+                                   host + " and port: " + str(port))
             a_collection.insert({"test":1})
         except ServerSelectionTimeoutError as e:
             messagebox.showerror(title="Error", message="Can't connect", parent=frame.root)
-            print(LOG_NAME + " :: ERROR :: "+ str(e))
+            message = LOG_NAME + " :: ERROR :: " + str(e)
+            print(message)
+            read_write.log_message(message)
             return False
 
         # if all OK, drop the test database
@@ -50,6 +61,7 @@ def can_connect(frame):
         # but make a global variable of the client, because we reference to it many times
         global client
         client = connection
+        read_write.log_message(LOG_NAME + " :: INFO :: Successfully connected")
         return True
 
 
@@ -59,7 +71,8 @@ def store_tweet(tweet):
         collection.insert(tweet)
         return True
     except DuplicateKeyError as e:
-        print(LOG_NAME +  " :: ERROR :: "+ str(e))
+        message = LOG_NAME + " :: ERROR :: " + str(e)
+        print(message)
         return False
 
 

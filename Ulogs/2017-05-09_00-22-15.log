@@ -1,0 +1,20 @@
+2017-05-09 00:22:15>> --> stream_util.py :: INFO :: StreamListener initialized
+2017-05-09 00:22:15>> --> stream_util.py :: INFO :: StreamController initialized
+2017-05-09 00:22:15>> --> search_util.py :: INFO :: SearchController initialized
+2017-05-09 00:22:15>> --> main.py :: INFO :: Program starts
+2017-05-09 00:22:16>> --> db_utils.py :: INFO :: Trying to get client
+2017-05-09 00:22:16>> --> db_utils.py :: INFO :: Trying to connect to MongoDB with host: localhost and port: 27017
+2017-05-09 00:22:16>> --> db_utils.py :: INFO :: Successfully connected
+2017-05-09 00:22:17>> --> main.py :: INFO :: Using database: test - collection: ss
+2017-05-09 00:22:20>> --> stream_util.py :: INFO :: Trying to connect to the Streaming Server...
+2017-05-09 00:22:21>> --> stream_util.py :: HTTP_ERROR :: 401 Unauthorized - Missing or incorrect authentication credentials.
+2017-05-09 00:22:21>> --> stream_util.py :: INFO :: Stopping stream
+2017-05-09 00:22:25>> --> stream_util.py :: INFO :: Terminating stream...
+2017-05-09 00:22:31>> --> manage_credentials.py :: INFO :: Trying to connect to Search API...
+2017-05-09 00:22:31>> --> manage_credentials.py :: ERROR :: Expected token_type to equal "bearer", but got None instead
+2017-05-09 00:22:31>> --> search_util.py :: INFO :: #### Gathering tweets for 'trump' keyword. ####
+2017-05-09 00:22:31>> --> search_util.py :: INFO :: Tweets per query = 100
+2017-05-09 00:22:31>> --> search_util.py :: ERROR :: 'NoneType' object has no attribute 'search'
+--> search_util.py :: REASON :: Can't connect to server.
+2017-05-09 00:22:31>> --> search_util.py :: INFO :: Search stopped successfully.
+2017-05-09 00:22:31>> --> search_util.py :: INFO :: Gathered 0 tweets - Ignored 0 tweets

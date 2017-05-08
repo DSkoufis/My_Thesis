@@ -3,10 +3,15 @@
 ###############################################################
 import json
 import os
+from Utilities import other_utils
 
 LOG_NAME = "--> read_write.py"
 
 file_path = os.path.abspath("Ufiles")
+
+# we initialize a log_file, every time the program starts
+log_file = str(other_utils.get_timestamp()).replace(' ', '_').replace(':', '-') + ".log"
+log_path = os.path.abspath("Ulogs/" + log_file)
 
 
 # function that returns the data in json format from mongo.json file
@@ -15,7 +20,9 @@ def read_mongo():
         with open(os.path.abspath(file_path + "/mongo.json")) as datafile:
             data = json.load(datafile)
     except FileNotFoundError as fe:
-        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        print(message)
+        log_message(message)
         data = []
     return data
 
@@ -26,7 +33,9 @@ def read_last():
         with open(os.path.abspath(file_path + "/last.json")) as datafile:
             data = json.load(datafile)
     except FileNotFoundError as fe:
-        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        print(message)
+        log_message(message)
         data = {}
     return data
 
@@ -37,7 +46,9 @@ def read_keywords():
         with open(os.path.abspath(file_path + "/keywords.json")) as datafile:
             data = json.load(datafile)
     except FileNotFoundError as fe:
-        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        print(message)
+        log_message(message)
         data = []
     return data
 
@@ -48,7 +59,9 @@ def read_credentials():
         with open(os.path.abspath(file_path + "/credentials.json")) as datafile:
             credentials = json.load(datafile)
     except FileNotFoundError as fe:
-        print(LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe))
+        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        print(message)
+        log_message(message)
         credentials = {}
     return credentials
 
@@ -71,12 +84,19 @@ def write_keywords(data):
     keywords = read_keywords()
     if data in keywords:  # if the keyword is already in the file
         return
+
     # we use a while loop, to catch if user enter manually some keywords in the json file
     while len(keywords) >= 10:  # if we have 10 keywords stored
         keywords.pop()  # pop the last out
     keywords.insert(0, data)  # and insert in the first position the new one
     with open(os.path.abspath(file_path + "/keywords.json"), "w") as outfile:
         json.dump(keywords, outfile, sort_keys=False, indent=2)
+
+
+# function that opens the log file and appends the new message
+def log_message(message):
+    with open(log_path, "a") as logging:
+        logging.write(str(other_utils.get_timestamp()) + ">> " + message + "\n")
 
 
 # function that gets as argument a window and sets a favicon to it
