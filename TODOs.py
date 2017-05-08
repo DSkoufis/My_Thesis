@@ -7,19 +7,8 @@
 
 # TODO: Make a script to validate and store credentials
 
-# TODO: Make a word graph
-"""
-pipeline = db.ss.aggregate([{$unwind : "$text.words"}, 
-                            { $group : 
-                                { "_id" : "$text.words.value", 
-                                        "counter" : { $sum : 1 } 
-                                }
-                            }
-                           ])
-                           
-results : { "_id" : "appreciate", "counter" : 1 }
-"""
-
 # TODO: Make a window, which prints all tweets with the given keyword (user gives it)
 
 # TODO: Make stream and search log messages, printed on a toplevel window
+
+# TODO: Add logging in a log file and proper logging system

@@ -74,7 +74,6 @@ def goto_search_frame(root, frame):
 def goto_stats_frame(root, frame):
     frame.destroy()
     stats_frame = frames.StatsFrame(root)
-    # TODO: add functionality to buttons
     stats_frame.back_btn.config(command=lambda: goto_main_frame(root=root, frame=stats_frame))
     root.title("-- Twitter API --  Stats & Quick Facts")
     stats_frame.pack()
