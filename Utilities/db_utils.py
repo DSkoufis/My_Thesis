@@ -26,7 +26,6 @@ def can_connect(frame):
             return False
 
         try:  # try connect to the MongoDB
-            read_write.log_message(LOG_NAME + " :: INFO :: Trying to get client")
             connection = MongoClient(host=host, port=port, serverSelectionTimeoutMS=10000, tz_aware=True)
         except ConfigurationError as e:  # if host is not appropriate
             messagebox.showerror(title="Error", message=str(e), parent=frame.root)

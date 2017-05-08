@@ -96,7 +96,7 @@ def write_keywords(data):
 # function that opens the log file and appends the new message
 def log_message(message):
     with open(log_path, "a") as logging:
-        logging.write(str(other_utils.get_timestamp()) + ">> " + message + "\n")
+        logging.write(str(other_utils.get_timestamp()) + message + "\n")
 
 
 # function that gets as argument a window and sets a favicon to it

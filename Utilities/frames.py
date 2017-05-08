@@ -66,7 +66,8 @@ class HostFrame(Frame):
                 self.host_entry.insert(0, previous_data["host"])
                 self.port_entry.insert(0, previous_data["port"])
         except KeyError as e:
-            print(LOG_NAME + " :: ERROR :: KeyError " + str(e))
+            message = LOG_NAME + " (HostFrame) :: ERROR :: KeyError " + str(e)
+            read_write.log_message(message)
 
         # Build the widgets for button_frm
         self.next_btn = Button(button_frm, text="Next")
@@ -136,12 +137,14 @@ class DbFrame(Frame):
             if previous_data["database"] is not "":
                 self.db_entry.insert(0, previous_data["database"])
         except KeyError as e:
-            print(LOG_NAME + " :: ERROR :: KeyError " + str(e))
+            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError " + str(e)
+            read_write.log_message(message)
         try:
             if previous_data["collection"] is not "":
                 self.collection_entry.insert(0, previous_data["collection"])
         except KeyError as e:
-            print(LOG_NAME + " :: ERROR :: KeyError " + str(e))
+            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError " + str(e)
+            read_write.log_message(message)
 
         # Build the widgets for button_frm
         self.next_btn = Button(button_frm, text="Next")
@@ -174,6 +177,7 @@ class DbFrame(Frame):
         db_list = self.client.database_names()  # we get the available database names of this connection
 
         db_counter = 0
+        read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: DBs found: " + str(db_list))
         for name in db_list:
             r = Radiobutton(self.dbs_frm, text=name, variable=db_var, value=name, command=select_db)
             r.grid(row=db_counter, column=2, pady=2)
@@ -247,6 +251,7 @@ class DbFrame(Frame):
         answer = messagebox.askokcancel(title="Are you sure?", message="Are you sure you want to delete " + name,
                                default="cancel", parent=self.root)
         if answer:
+            read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: Dropping database '" + name + "'")
             self.client.drop_database(name)
             self.hide_dbs()
             self.show_dbs()
@@ -256,6 +261,7 @@ class DbFrame(Frame):
         answer = messagebox.askokcancel(title="Are you sure?", message="Are you sure you want to delete " + name,
                                default="cancel", parent=self.root)
         if answer:
+            read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: Dropping collection '" + name + "'")
             db_name = self.db_entry.get()
             self.client[db_name].drop_collection(name)
             self.hide_collections()
