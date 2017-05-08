@@ -511,6 +511,11 @@ class StatsFrame(Frame):
             self.coordinates_map_btn = Button(show_graphs_frm, text="Show map with coordinates",
                                               command=graph_utils.show_coordinates_map)
             self.coordinates_map_btn.grid(row=2, column=1, pady=10, ipadx=5)
+
+            # words distribution graph
+            self.words_graph_btn = Button(show_graphs_frm, text="Words Distribution Graph",
+                                          command=lambda: stats_utils.show_words_graph(self.root))
+            self.words_graph_btn.grid(row=3, column=1, pady=10, ipadx=5)
         else:  # if we have an empty collection
             message = "No documents found in this collection.\n"
             message += "Please enter some data first."

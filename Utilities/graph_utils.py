@@ -73,7 +73,7 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
         # with this for, we store all data in the all_results dictionary like above,
         # because we need a list, to be able to sort our data
         # we must clear the data, if user applied filter in here
-        # so if item is in exclude list, do not calculate anythin
+        # so if item is in exclude list, do not calculate anything
         if item["_id"] not in exclude_list:
             # but if it is not in exclude list, check if it is in include list
             # before clear it with more_than and less_than borders
@@ -135,4 +135,54 @@ def show_coordinates_map():
 
     sample_sum = str(results.count())
     plt.title("Results of " + sample_sum + " tweets sample.")
+    plt.show()
+
+
+# function that is responsible to show a graph with word distribution after applying the desired filters
+def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_list, include_word_list):
+    collection = db_utils.get_collection()
+
+    # this is what we request from the MongoDB, we use the aggregation framework
+    pipeline = [{"$unwind": "$text.words"},
+                {"$group": {"_id": "$text.words.value",
+                            "counter": {"$sum": 1}
+                            }
+                 }]
+
+    results = collection.aggregate(pipeline)  # we get the cursor from the database
+
+    # in here we store all results, because PyMongo returns us a cursor
+    all_results_list = []
+
+    for word in results:
+        # the results from the aggregation are in the format: [{"_id": "a word", "sum": 208"}, ... ]
+        # with this for, we store all data in the all_results dictionary like above,
+        # because we need a list, to be able to sort our data
+        # we must clear the data, if user applied filter in here
+        # so if item is in exclude list, do not calculate anything
+        if word["_id"] not in exclude_word_list:
+            # but if it is not in exclude list, check if it is in include list
+            # before clear it with more_than and less_than borders
+            if word["_id"] in include_word_list:
+                all_results_list.append(word)
+            else:
+                if word["counter"] > exclude_less_than:
+                    if word["counter"] < exclude_more_than:
+                        all_results_list.append(word)
+
+    # sort the list by sum number in descending order
+    all_results_sorted = sorted(all_results_list, key=itemgetter("counter"), reverse=True)
+
+    all_words = []  # this list holds all words after the sorting
+    values = []  # this list holds all counter values of each word after the sorting
+    for word in all_results_sorted:
+        all_words.append(word["_id"])
+        values.append(word["counter"])
+
+    y_pos = np.arange(len(all_words))
+
+    plt.bar(y_pos, values, color='g', align='center', alpha=0.5)
+    plt.xticks(y_pos, all_words, rotation=45)  # rotate the strings 45 degrees
+    plt.ylabel("Number of occurrences in tweets")
+    plt.title("Words occurrences")
     plt.show()
