@@ -99,7 +99,7 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
 
     read_write.log_message(LOG_NAME + " (TZ Graph) :: INFO :: Sample sum: " + str(len(time_zones)))
 
-    plt.bar(y_pos, values, color='r', align='center', alpha=0.5)
+    plt.bar(y_pos, values, color='r', align='center')
     plt.xticks(y_pos, time_zones, rotation=45)  # rotate the strings 45 degrees
     plt.ylabel("Number of tweets")
     plt.title("Number of tweets per time zone")
@@ -152,28 +152,66 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
                 {"$group": {"_id": "$text.words.value",
                             "counter": {"$sum": 1}
                             }
-                 }]
-
-    results = collection.aggregate(pipeline)  # we get the cursor from the database
+                 }
+                ]
 
     # in here we store all results, because PyMongo returns us a cursor
     all_results_list = []
 
+    # if user provided some include words, make a query and retrieve these words
+    if len(include_word_list) > 0:
+        pipeline_include = [{"$unwind": "$text.words"},
+                            {"$group": {"_id": "$text.words.value",
+                                        "counter": {"$sum": 1}
+                                        }
+                             },
+                            {"$match": {"$or": []}
+                             }]
+        # append each word in the '$or' list
+        for including_word in include_word_list:
+            pipeline_include[2]["$match"]["$or"].append({"_id": including_word})
+
+        # make the query
+        results = collection.aggregate(pipeline_include)
+
+        # and append the results into the all_results_list to calculate them in the final graph
+        for word in results:
+            if word["_id"] not in exclude_word_list:
+                all_results_list.append(word)
+
+    # if user provided an exclude word list, we exclude them from the query
+    if len(exclude_word_list) > 0:
+        # we have an if here, because if user gave an exclude list, we must use the '$and' keyword
+        # to exclude both numbers and words
+        extra_value = {"$match":
+            {"$and": [
+                {"counter": {"$gt": exclude_less_than,
+                             "$lt": exclude_more_than
+                             }
+                 }
+            ]}
+        }
+        # and we append at the '$and' list the words in < _id: ($ne: word) > format
+        for word in exclude_word_list:
+            extra_value["$match"]["$and"].append({"_id": {"$ne": word}})
+
+        pipeline.append(extra_value)  # add these values in the pipeline
+    else:  # but if he doesn't, we just exclude the numbers and add it to the pipeline
+        pipeline.append({"$match": {"counter": {"$gt": exclude_less_than,
+                                                "$lt": exclude_more_than
+                                                }
+                                    }
+                         })
+
+    results = collection.aggregate(pipeline)  # we get the cursor from the database
+
     for word in results:
         # the results from the aggregation are in the format: [{"_id": "a word", "sum": 208"}, ... ]
         # with this for, we store all data in the all_results dictionary like above,
-        # because we need a list, to be able to sort our data
-        # we must clear the data, if user applied filter in here
-        # so if item is in exclude list, do not calculate anything
-        if word["_id"] not in exclude_word_list:
-            # but if it is not in exclude list, check if it is in include list
-            # before clear it with more_than and less_than borders
-            if word["_id"] in include_word_list:
-                all_results_list.append(word)
-            else:
-                if word["counter"] > exclude_less_than:
-                    if word["counter"] < exclude_more_than:
-                        all_results_list.append(word)
+        # because we need a list, to be able to sort our data (not a cursor).
+        # if user excluded a word or the word length is smaller than 2, do not append it
+        if len(word["_id"]) > 2:
+            all_results_list.append(word)
 
     # sort the list by sum number in descending order
     all_results_sorted = sorted(all_results_list, key=itemgetter("counter"), reverse=True)
@@ -188,7 +226,7 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
 
     read_write.log_message(LOG_NAME + " (Words Graph) :: INFO :: Sample sum: " + str(len(all_words)))
 
-    plt.bar(y_pos, values, color='g', align='center', alpha=0.5)
+    plt.bar(y_pos, values, color='g', align='center')
     plt.xticks(y_pos, all_words, rotation=45)  # rotate the strings 45 degrees
     plt.ylabel("Number of occurrences in tweets")
     plt.title("Words occurrences")
