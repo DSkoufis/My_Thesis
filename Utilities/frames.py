@@ -509,6 +509,11 @@ class StatsFrame(Frame):
             self.words_graph_btn = Button(show_graphs_frm, text="Words Distribution Graph",
                                           command=lambda: stats_utils.show_words_graph(self.root))
             self.words_graph_btn.grid(row=3, column=1, pady=10, ipadx=5)
+
+            # keyword search pane
+            self.keyword_search_btn = Button(show_graphs_frm, text="Find tweets",
+                                             command=lambda: stats_utils.keyword_search(self.root))
+            self.keyword_search_btn.grid(row=4, column=1, pady=10, ipadx=5)
         else:  # if we have an empty collection
             message = "No documents found in this collection."
             read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: " + message)

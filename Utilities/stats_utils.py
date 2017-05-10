@@ -261,3 +261,9 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
 
     graph_utils.show_word_distribution(more_than_value, less_than_value,
                                        exclude_words_list_final, include_words_list_final)
+
+
+# show a Toplevel windown, that user can enter a keyword, with which we will search the collection
+# and show the tweet's text in a new pane
+def keyword_search(root):
+    return
