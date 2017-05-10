@@ -8,5 +8,25 @@
 # TODO: Make a script to validate and store credentials
 
 # TODO: Make a window, which prints all tweets with the given keyword (user gives it)
+# db.ss.find(
+#     {"text.words":
+#         {"$all":
+#              [{"value": "stupid"},
+#               {"value": "jack"}
+#               ]
+#          },
+#      "text.stop_words" :
+#          {"$all":
+#               ["just"]
+#           }
+#      },
+#     {"_id": 0,
+#      "whole_text": 1
+#      }
+# )
 
 # TODO: Make stream and search log messages, printed on a toplevel window
+
+# TODO: Make a 2 axis graph -> x axis: year, y axis: user_count
+
+# TODO: Make a 2 axis graph -> x axis: users, y axis: followers-statuses-friends

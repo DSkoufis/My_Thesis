@@ -97,8 +97,8 @@ def goto_main_frame(root, frame):
 
         if db_validation is not None:
             if collection_validation is not None:
-                read_write.log_message(LOG_NAME + " :: INFO :: Using database: " +
-                                       database + " - collection: " + collection)
+                read_write.log_message(LOG_NAME + " :: INFO :: Using database: '" +
+                                       database + "' - collection: '" + collection + "'")
                 client = db_utils.get_client()
                 temp = client.address
                 host = temp[0]
