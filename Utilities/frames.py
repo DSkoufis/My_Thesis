@@ -448,65 +448,46 @@ class StatsFrame(Frame):
         self.root = master
         self.collection = db_utils.get_collection()
 
-        all_documents = self.collection.find()  # this is a Cursor object
+        self.all_documents = self.collection.find()  # this is a Cursor object
 
-        quick_facts_frm = Frame(self)
-        quick_facts_frm.grid(row=0, column=0, pady=10)
+        self.quick_facts_frm = Frame(self)
+        self.quick_facts_frm.grid(row=0, column=0, pady=20)
         show_graphs_frm = Frame(self)
         show_graphs_frm.grid(row=1, column=0, pady=10)
         exit_frm = Frame(self)
         exit_frm.grid(row=2, column=0, pady=10)
 
-        Label(quick_facts_frm, text="Total unique tweets stored:").grid(row=0, column=0, padx=10, pady=2, sticky=W)
-        tweets_sum = all_documents.count()
+        Label(self.quick_facts_frm, text="Total unique tweets stored:").grid(row=0, column=0, padx=10, pady=2, sticky=W)
+        tweets_sum = self.all_documents.count()
         read_write.log_message(LOG_NAME + " (StatsFrame) :: INFO :: Found " + str(tweets_sum) + " tweets in the DB")
-        Label(quick_facts_frm, text=str(tweets_sum)).grid(row=0, column=2, pady=2, sticky=W)
+        Label(self.quick_facts_frm, text=str(tweets_sum)).grid(row=0, column=2, pady=2, sticky=W)
 
         # if we use a collection with no stored tweets, we do not show any data or metric
         if tweets_sum > 0:
 
-            Label(quick_facts_frm, text="Number of entries that\nare retweets:").grid(row=1, column=0, padx=10, pady=2,
-                                                                                      sticky=W)
+            Label(self.quick_facts_frm, text="Number of entries that\nare retweets:").grid(row=1, column=0, padx=10,
+                                                                                           pady=2,
+                                                                                           sticky=W)
             number_of_retweets = self.collection.find({"is_retweet": True}).count()
-            Label(quick_facts_frm, text=str(number_of_retweets)).grid(row=1, column=2, pady=2, sticky=W)
+            Label(self.quick_facts_frm, text=str(number_of_retweets)).grid(row=1, column=2, pady=2, sticky=W)
 
             # the rest of the "quick facts" will only be shown, only if db's size is smaller than 100.000 documents
             # otherwise, they will not be so "quick"!!
-            if tweets_sum <= 100000:
-                # iterate the cursor once here and find all values you want
-                unique_users = []  # how many unique users we have
-                max_counter = 0  # the most statuses count from a user
-
-                for item in all_documents:  # for all items in the db
-                    if item["user"]["id_str"] not in unique_users:  # check the user.id_str
-                        unique_users.append(item["user"]["id_str"])
-                    if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
-                        max_counter = item["user"]["statuses_count"]
-                users_sum = len(unique_users)
-
-                # showing the number of unique users
-                Label(quick_facts_frm, text="Number of unique users:").grid(row=2, column=0, padx=10, pady=2, sticky=W)
-                Label(quick_facts_frm, text=str(users_sum)).grid(row=2, column=2, pady=2, sticky=W)
-
-                # showing the number of verified users
-                Label(quick_facts_frm, text="Verified users:").grid(row=3, column=0, padx=10, pady=2, sticky=W)
-                verified_users_sum = self.collection.find(filter={"user.verified": True}).count()
-                Label(quick_facts_frm, text=str(verified_users_sum)).grid(row=3, column=2, pady=2, sticky=W)
-
-                # showing the oldest tweet
-                Label(quick_facts_frm, text="Oldest created tweet\nstored in the database:").grid(row=4, column=0,
-                                                                                                  padx=10, pady=2,
-                                                                                                  sticky=W)
-                oldest_tweet_cursor = self.collection.find().sort("created_at", DESCENDING).limit(1)
-                oldest_tweet = [item["created_at"] for item in oldest_tweet_cursor]
-                Label(quick_facts_frm, text=oldest_tweet).grid(row=4, column=2, pady=2, sticky=W)
-
-                # showing the most statuses by a user
-                Label(quick_facts_frm, text="Most statuses by a user:").grid(row=5, column=0, padx=10, pady=2, sticky=W)
-                Label(quick_facts_frm, text=str(max_counter)).grid(row=5, column=2, pady=2, sticky=W)
+            if tweets_sum <= 5000:
+                self.show_quick_facts(False)
             else:
-                read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
-                                       "100000 tweets in the DB. No 'Quick Facts' are shown")
+                if tweets_sum <= 100000:
+                    self.show_qf_btn = Button(self.quick_facts_frm, text="Show Quick Facts",
+                                              command=self.show_quick_facts)
+                    self.show_qf_btn.grid(row=2, column=0, pady=10, ipadx=40, columnspan=3)
+                    read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
+                                           "5000 tweets in the DB.")
+                else:
+                    # no quick facts
+                    Label(self.quick_facts_frm, text="No facts available, too many documents.").grid(row=2, column=1,
+                                                                                                     pady=10, ipadx=4)
+                    read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
+                                           "100000 tweets in the DB.")
 
             # build the widgets for show_graphs_frm
             # letters distribution graph
@@ -532,13 +513,50 @@ class StatsFrame(Frame):
             message = "No documents found in this collection."
             read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: " + message)
             message += "\nPlease enter some data first."
-            Label(quick_facts_frm, text=message).grid(row=1, column=0, padx=10, pady=5)
+            Label(self.quick_facts_frm, text=message).grid(row=1, column=0, padx=10, pady=5)
 
         # Build the widgets for exit_frm
         self.back_btn = Button(exit_frm, text="Back")
         self.back_btn.grid(row=0, column=1, ipadx=5, ipady=3, pady=15)
         self.exit_btn = Button(exit_frm, text="Exit", command=self.safe_exit)
         self.exit_btn.grid(row=0, column=3, ipadx=5, ipady=3, padx=15, pady=10)
+
+    def show_quick_facts(self, *args):
+        # if arguments are passed, means that no button have been created
+        if len(args) is 0:
+            self.show_qf_btn.destroy()
+
+        # iterate the cursor once here and find all values you want
+        unique_users = []  # how many unique users we have
+        max_counter = 0  # the most statuses count from a user
+
+        for item in self.all_documents:  # for all items in the db
+            if item["user"]["id_str"] not in unique_users:  # check the user.id_str
+                unique_users.append(item["user"]["id_str"])
+            if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
+                max_counter = item["user"]["statuses_count"]
+        users_sum = len(unique_users)
+
+        # showing the number of unique users
+        Label(self.quick_facts_frm, text="Number of unique users:").grid(row=2, column=0, padx=10, pady=2, sticky=W)
+        Label(self.quick_facts_frm, text=str(users_sum)).grid(row=2, column=2, pady=2, sticky=W)
+
+        # showing the number of verified users
+        Label(self.quick_facts_frm, text="Verified users:").grid(row=3, column=0, padx=10, pady=2, sticky=W)
+        verified_users_sum = self.collection.find(filter={"user.verified": True}).count()
+        Label(self.quick_facts_frm, text=str(verified_users_sum)).grid(row=3, column=2, pady=2, sticky=W)
+
+        # showing the oldest tweet
+        Label(self.quick_facts_frm, text="Oldest created tweet\nstored in the database:").grid(row=4, column=0,
+                                                                                               padx=10, pady=2,
+                                                                                               sticky=W)
+        oldest_tweet_cursor = self.collection.find().sort("created_at", DESCENDING).limit(1)
+        oldest_tweet = [item["created_at"] for item in oldest_tweet_cursor]
+        Label(self.quick_facts_frm, text=oldest_tweet).grid(row=4, column=2, pady=2, sticky=W)
+
+        # showing the most statuses by a user
+        Label(self.quick_facts_frm, text="Most statuses by a user:").grid(row=5, column=0, padx=10, pady=2, sticky=W)
+        Label(self.quick_facts_frm, text=str(max_counter)).grid(row=5, column=2, pady=2, sticky=W)
 
     def safe_exit(self):
         x = messagebox.askyesno(title="Exit", message="Are you sure you want to exit?",

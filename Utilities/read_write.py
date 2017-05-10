@@ -12,7 +12,7 @@ file_path = os.path.abspath("Ufiles")
 # we initialize a log_file, every time the program starts
 log_file = str(other_utils.get_timestamp()).replace(' ', '_').replace(':', '-') + ".log"
 log_path = os.path.abspath("Ulogs/" + log_file)
-print(LOG_NAME + " :: INFO :: Log files path set: " + str(log_path))
+print(LOG_NAME + " :: INFO :: Log file path set: " + str(log_path))
 
 
 # function that returns the data in json format from mongo.json file
