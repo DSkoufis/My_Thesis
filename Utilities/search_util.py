@@ -5,6 +5,7 @@ from Utilities import db_utils, read_write, manage_credentials, other_utils
 from tkinter import messagebox
 from threading import Thread, Event
 from tweepy import TweepError
+from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 
 LOG_NAME = "--> search_util.py"
 
@@ -78,17 +79,25 @@ class SearchController(object):
                 print("Saved {0} tweets till now".format(tweet_count))  # and we print them
 
                 max_ID = new_tweets[-1].id  # we need to re - set the max_ID for the new search query
-            except TweepError as error:
-                message = LOG_NAME + " :: ERROR :: " + str(error)
+            except TweepError as e:
+                message = LOG_NAME + " :: ERROR :: TweepError:" + str(e)
                 print(message)  # we log the error
                 read_write.log_message(message)
                 break
             except AttributeError as e:
-                message_1 = LOG_NAME + " :: ERROR :: " + str(e)
+                message_1 = LOG_NAME + " :: ERROR :: AttributeError:" + str(e)
                 read_write.log_message(message_1)
                 message_2 = LOG_NAME + " :: REASON :: Can't connect to Twitter Server."
                 print(message_1 + "\n" + message_2)
                 read_write.log_message(message_2)
+                break
+            except ServerSelectionTimeoutError as e:
+                read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                messagebox.showerror("Error", "Lost Connection to the DB")
+                break
+            except AutoReconnect as e:
+                read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+                messagebox.showerror("Error", "Lost Connection to the DB")
                 break
         read_write.log_message(LOG_NAME + " :: INFO :: Search stopped successfully.")
         message = LOG_NAME + " :: INFO :: Gathered " + str(tweet_count) + " tweets - Ignored "

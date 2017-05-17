@@ -5,6 +5,7 @@ from tweepy import StreamListener
 import json
 from tkinter import messagebox
 from datetime import datetime
+from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 from Utilities import db_utils, manage_credentials, read_write, other_utils
 
 LOG_NAME = "--> stream_util.py"
@@ -61,16 +62,25 @@ class StdOutListener(StreamListener):
 
         # we pass our data into this static method to clean them and keep only the necessary
         our_tweet = self.process_tweet(data)
+        try:
+            # this method try to save our tweet to the active connection to Mongo and returns the outcome
+            # If all are OK, returns True, but if it fail, it returns False. With this way, we keep track
+            # how many tweets we stored so far
+            if db_utils.store_tweet(our_tweet):
+                self.store_counter += 1  # increase the counter
+                if self.store_counter % 100 == 0:  # and if we reach a multiply of 100, we print the result
+                    print("Stored " + str(self.store_counter) + " tweets so far.")
+            else:
+                self.ignore_counter += 1
+        except ServerSelectionTimeoutError as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
+            return False
+        except AutoReconnect as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
+            return False
 
-        # this method try to save our tweet to the active connection to Mongo and returns the outcome
-        # If all are OK, returns True, but if it fail, it returns False. With this way, we keep track
-        # how many tweets we stored so far
-        if db_utils.store_tweet(our_tweet):
-            self.store_counter += 1  # increase the counter
-            if self.store_counter % 100 == 0:  # and if we reach a multiply of 100, we print the result
-                print("Stored " + str(self.store_counter) + " tweets so far.")
-        else:
-            self.ignore_counter += 1
         # return True to continue the loop
         return True
 
@@ -108,6 +118,10 @@ class StdOutListener(StreamListener):
                   ", Reason=" + status["reason"] + ", Code=" + str(status["code"])
         print(message)
         read_write.log_message(message)
+        return False
+
+    def on_exception(self, exception):
+        read_write.log_message(LOG_NAME + " :: ERROR :: " + str(exception))
         return False
 
     # setters for the flags
@@ -193,13 +207,13 @@ class StreamController(object):
             stream.filter(track=search_list,
                           async=True)  # start the loop, async sets the Streaming in a new Thread
         except AttributeError as e:
-            message = LOG_NAME + " :: ERROR :: " + str(e)
+            message = LOG_NAME + " :: ERROR :: AttributeError:" + str(e)
             print(message)
             read_write.log_message(message)
             messagebox.showerror("Fatal error", "No credentials were found. Please close the script, " +
                                  "add the file and try again!")
         except Exception as e:
-            message = LOG_NAME + " :: ERROR :: " + str(repr(e))
+            message = LOG_NAME + " :: ERROR :: Exception:" + str(repr(e))
             print(message)
             read_write.log_message(message)
             pass

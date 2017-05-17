@@ -3,6 +3,8 @@ from mpl_toolkits.basemap import Basemap
 import numpy as np
 from Utilities import db_utils, other_utils, read_write
 from operator import itemgetter
+from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
+from tkinter import messagebox
 
 LOG_NAME = "--> graph_util.py"
 
@@ -17,7 +19,16 @@ def show_letter_distribution():
                             "counter": {"$sum": "$text.characters_map.value"}
                             }
                  }]
-    results = collection.aggregate(pipeline)  # we get the cursor
+    try:
+        results = collection.aggregate(pipeline)  # we get the cursor
+    except ServerSelectionTimeoutError as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+    except AutoReconnect as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
     all_results = {}  # this is where the results will be
     # we couldn't keep the results, because we can't use a cursor
 
@@ -64,8 +75,16 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
                             "sum": {"$sum": 1}
                             }
                  }]
-
-    results = collection.aggregate(pipeline)  # we get the cursor from the database
+    try:
+        results = collection.aggregate(pipeline)  # we get the cursor from the database
+    except ServerSelectionTimeoutError as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+    except AutoReconnect as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
 
     # in here we store all results, because PyMongo returns us a cursor
     all_results_list = []
@@ -130,12 +149,21 @@ def show_coordinates_map():
     m.drawcoastlines(linewidth=1)
     m.drawcountries(linewidth=0.5)
 
-    # we iterate with the cursor and we save every element on the plot
-    for coordinate in results:
-        lon = coordinate["coordinates"]["coordinates"][0]  # we need longitude
-        lat = coordinate["coordinates"]["coordinates"][1]  # and latitude
-        xpt, ypt = m(lon, lat)
-        m.plot(xpt, ypt, 'ro', markersize=2)  # and we create the point on the map
+    try:
+        # we iterate with the cursor and we save every element on the plot
+        for coordinate in results:
+            lon = coordinate["coordinates"]["coordinates"][0]  # we need longitude
+            lat = coordinate["coordinates"]["coordinates"][1]  # and latitude
+            xpt, ypt = m(lon, lat)
+            m.plot(xpt, ypt, 'ro', markersize=2)  # and we create the point on the map
+    except ServerSelectionTimeoutError as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+    except AutoReconnect as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
 
     sample_sum = str(results.count())
     read_write.log_message(LOG_NAME + " (Map Graph) :: INFO :: Sample sum: " + sample_sum)
@@ -203,7 +231,16 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
                                     }
                          })
 
-    results = collection.aggregate(pipeline)  # we get the cursor from the database
+    try:
+        results = collection.aggregate(pipeline)  # we get the cursor from the database
+    except ServerSelectionTimeoutError as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+    except AutoReconnect as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
 
     for word in results:
         # the results from the aggregation are in the format: [{"_id": "a word", "sum": 208"}, ... ]

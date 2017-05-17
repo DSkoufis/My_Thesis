@@ -20,7 +20,7 @@ def can_connect(frame):
             port = int(frame.port_entry.get())  # getting the port, if it is not an int, we will have en exception
         except ValueError as e:
             messagebox.showerror(title="Error", message="Port must be an integer", parent=frame.root)
-            message = LOG_NAME + " :: ERROR :: " + str(e)
+            message = LOG_NAME + " :: ERROR :: ValueError:" + str(e)
             print(message)
             read_write.log_message(message)
             return False
@@ -29,13 +29,13 @@ def can_connect(frame):
             connection = MongoClient(host=host, port=port, serverSelectionTimeoutMS=10000, tz_aware=True)
         except ConfigurationError as e:  # if host is not appropriate
             messagebox.showerror(title="Error", message=str(e), parent=frame.root)
-            message = LOG_NAME + " :: ERROR :: " + str(e)
+            message = LOG_NAME + " :: ERROR :: ConfigurationError:" + str(e)
             print(message)
             read_write.log_message(message)
             return False
         except TypeError as e:  # if port result to an error
             messagebox.showerror(title="Error", message=str(e), parent=frame.root)
-            message = LOG_NAME + " :: ERROR :: " + str(e)
+            message = LOG_NAME + " :: ERROR :: TypeError:" + str(e)
             print(message)
             read_write.log_message(message)
             return False
@@ -50,7 +50,7 @@ def can_connect(frame):
             a_collection.insert({"test":1})
         except ServerSelectionTimeoutError as e:
             messagebox.showerror(title="Error", message="Can't connect", parent=frame.root)
-            message = LOG_NAME + " :: ERROR :: " + str(e)
+            message = LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e)
             print(message)
             read_write.log_message(message)
             return False
@@ -70,7 +70,7 @@ def store_tweet(tweet):
         collection.insert(tweet)
         return True
     except DuplicateKeyError as e:
-        message = LOG_NAME + " :: ERROR :: " + str(e)
+        message = LOG_NAME + " :: ERROR :: DuplicateKeyError:" + str(e)
         print(message)
         return False
 

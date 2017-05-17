@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from Utilities import *
+from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 
 # variable that helps on logging
 LOG_NAME = "--> main.py"
@@ -72,8 +73,18 @@ def goto_search_frame(root, frame):
 
 
 def goto_stats_frame(root, frame):
+    try:
+        stats_frame = frames.StatsFrame(root)
+    except ServerSelectionTimeoutError as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+    except AutoReconnect as e:
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+
     frame.destroy()
-    stats_frame = frames.StatsFrame(root)
     stats_frame.back_btn.config(command=lambda: goto_main_frame(root=root, frame=stats_frame))
     root.title("-- Twitter API --  Stats & Quick Facts")
     stats_frame.pack()
@@ -100,7 +111,16 @@ def goto_main_frame(root, frame):
                 read_write.log_message(LOG_NAME + " :: INFO :: Using database: '" +
                                        database + "' - collection: '" + collection + "'")
                 client = db_utils.get_client()
-                temp = client.address
+                try:
+                    temp = client.address
+                except ServerSelectionTimeoutError as e:
+                    read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                    messagebox.showerror("Error", "Lost Connection to the DB")
+                    return
+                except AutoReconnect as e:
+                    read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+                    messagebox.showerror("Error", "Lost Connection to the DB")
+                    return
                 host = temp[0]
 
                 # write the selected values into last.json

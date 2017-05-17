@@ -97,7 +97,11 @@ def write_keywords(data):
 # function that opens the log file and appends the new message
 def log_message(message):
     with open(log_path, "a") as logging:
-        logging.write(str(other_utils.get_timestamp()) + message + "\n")
+        try:
+            logging.write(str(other_utils.get_timestamp()) + message + "\n")
+        except UnicodeEncodeError as e:
+            message = str(other_utils.get_timestamp()) + LOG_NAME + " :: WARN :: UnicodeEncodeError:" + str(e) + "\n"
+            logging.write(message)
 
 
 # function that gets as argument a window and sets a favicon to it

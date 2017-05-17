@@ -6,6 +6,7 @@ from tkinter.ttk import *
 from tkinter import messagebox
 from Utilities import read_write, db_utils, stream_util, search_util, graph_utils, stats_utils
 from pymongo import DESCENDING
+from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 
 LOG_NAME = "--> frames.py"
 
@@ -66,7 +67,7 @@ class HostFrame(Frame):
                 self.host_entry.insert(0, previous_data["host"])
                 self.port_entry.insert(0, previous_data["port"])
         except KeyError as e:
-            message = LOG_NAME + " (HostFrame) :: ERROR :: KeyError " + str(e)
+            message = LOG_NAME + " (HostFrame) :: ERROR :: KeyError:" + str(e)
             read_write.log_message(message)
 
         # Build the widgets for button_frm
@@ -137,13 +138,13 @@ class DbFrame(Frame):
             if previous_data["database"] is not "":
                 self.db_entry.insert(0, previous_data["database"])
         except KeyError as e:
-            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError " + str(e)
+            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError:" + str(e)
             read_write.log_message(message)
         try:
             if previous_data["collection"] is not "":
                 self.collection_entry.insert(0, previous_data["collection"])
         except KeyError as e:
-            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError " + str(e)
+            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError:" + str(e)
             read_write.log_message(message)
 
         # Build the widgets for button_frm
@@ -212,7 +213,14 @@ class DbFrame(Frame):
         # create the frame
         self.dbs_frm = Frame(self)  # the frame that will show the dbs
         self.dbs_frm.grid(row=2, pady=5, padx=50)
-        self.populate_dbs()
+        try:
+            self.populate_dbs()
+        except ServerSelectionTimeoutError as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
+        except AutoReconnect as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
 
         try:  # if collections already shown, we need to hide them, but if not, this will raise an exception
             self.hide_collections()
@@ -231,7 +239,14 @@ class DbFrame(Frame):
         # create the frame
         self.collections_frm = Frame(self)  # the frame that will show the collections
         self.collections_frm.grid(row=2, pady=5, padx=50)
-        self.populate_collections()
+        try:
+            self.populate_collections()
+        except ServerSelectionTimeoutError as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: " + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
+        except AutoReconnect as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: " + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
 
         try:  # if dbs already shown, we need to hide them, but if not, this will raise an exception
             self.hide_dbs()
@@ -527,20 +542,25 @@ class StatsFrame(Frame):
         self.exit_btn.grid(row=0, column=3, ipadx=5, ipady=3, padx=15, pady=10)
 
     def show_quick_facts(self, *args):
-        # if arguments are passed, means that no button have been created
-        if len(args) is 0:
-            self.show_qf_btn.destroy()
-
         # iterate the cursor once here and find all values you want
         unique_users = []  # how many unique users we have
         max_counter = 0  # the most statuses count from a user
 
-        for item in self.all_documents:  # for all items in the db
-            if item["user"]["id_str"] not in unique_users:  # check the user.id_str
-                unique_users.append(item["user"]["id_str"])
-            if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
-                max_counter = item["user"]["statuses_count"]
+        try:
+            for item in self.all_documents:  # for all items in the db
+                if item["user"]["id_str"] not in unique_users:  # check the user.id_str
+                    unique_users.append(item["user"]["id_str"])
+                if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
+                    max_counter = item["user"]["statuses_count"]
+        except AutoReconnect as e:
+            read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+            messagebox.showerror("Error", "Lost Connection to the DB")
+            return
         users_sum = len(unique_users)
+
+        # if arguments are passed, means that no button have been created
+        if len(args) is 0:
+            self.show_qf_btn.destroy()
 
         # showing the number of unique users
         Label(self.quick_facts_frm, text="Number of unique users:").grid(row=2, column=0, padx=10, pady=2, sticky=W)
