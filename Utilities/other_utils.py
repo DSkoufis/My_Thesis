@@ -295,6 +295,7 @@ def show_results(results, results_count, root):
     message = "######     Found %d unique results in the DB     ######" % results_count
     l.insert('end', message)
     l.insert('end', ' ')
+    l.itemconfigure(0, background='#f4a8ab')
 
     # we show the results
     counter = 1  # counter to keep track of the lines
@@ -305,6 +306,8 @@ def show_results(results, results_count, root):
             try:
                 # we try to insert the text into the listbox
                 l.insert('end', "%d  ->> " % counter + tweet["_id"])
+                if counter % 2 == 0:
+                    l.itemconfigure(counter + 1, background='#dbeeff')
                 counter += 1
             except TclError as e:
                 read_write.log_message(LOG_NAME + " (show_results) :: WARN :: TclError:" + str(e))
@@ -316,6 +319,7 @@ def show_results(results, results_count, root):
             message += "Too many to show them!     ######"
             l.insert('end', ' ')
             l.insert('end', message)
+            l.itemconfigure(counter + 2, background='#f4a8ab')
             break
 
     top_level.mainloop()
