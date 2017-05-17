@@ -5,7 +5,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from datetime import datetime
 import string
-from pymongo.errors import AutoReconnect
+from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 from pymongo import TEXT
 from tkinter import Toplevel, Listbox, messagebox, VERTICAL, S, N, E, W, TclError
 from tkinter.ttk import Frame, Button, Entry, Label, Scrollbar, Sizegrip
@@ -217,30 +217,62 @@ def search_in_db(frame, root):
         messagebox.showerror("Error", "You must specify a keyword")
         return
 
-    query = {"$text": {"$search": '"' + keyword + '"'}}
-    projection = ({"whole_text": 1, "_id": 0})
+    # query = {"$text": {"$search": '"' + keyword + '"'}}
+    # projection = ({"whole_text": 1, "_id": 0})
+    # results = collection.find(query, projection)  # perform a find query in the collection
     read_write.log_message(LOG_NAME + " (search_in_db) :: INFO :: Searching db for " + keyword)
-    results = collection.find(query, projection)  # perform a find query in the collection
-
+    pipeline = [{"$match":
+                     {"$text":
+                          {"$search": '"' + keyword + '"'
+                           }
+                      }
+                 },
+                {"$group":
+                     {"_id": "$whole_text"
+                      }
+                 },
+                {"$count": "count"
+                 }]
     try:
-        results_count = results.count()  # count the results
-    except AutoReconnect as e:
+        # this returns how many different results we have {"count": 2045}
+        results = collection.aggregate(pipeline)
+    except ServerSelectionTimeoutError as e:
         # if we have disconnected from the DB, return
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
 
+    results_count = 0  # his is for safety, if results are empty
+    # the only drawback of the aggregation is that we cannot count the results by calling .count()
+    # it is just an iterable cursor, with dictionary
+    # although these kind of queries are very fast
+    for item in results:
+        results_count = item["count"]
+
     # we show the results, if we have any, in a new window
     if 0 < results_count:
-        read_write.log_message(LOG_NAME + " :: INFO :: Found " + str(results_count) + " results")
-        show_results(results, root)
+        read_write.log_message(LOG_NAME + " :: INFO :: Found %d results" % results_count)
+        # getting the results to show them
+        pipeline = [{"$match":
+                         {"$text":
+                              {"$search": '"' + keyword + '"'
+                               }
+                          }
+                     },
+                    {"$group":
+                         {"_id": "$whole_text"
+                          }
+                     }]
+        # this returns the different results
+        results = collection.aggregate(pipeline)
+        show_results(results, results_count, root)
     else:
         messagebox.showinfo("Empty", "No results found for " + keyword + "!")
         message = LOG_NAME + " :: WARNING :: No results found for " + keyword
         read_write.log_message(message)
 
 
-def show_results(results, root):
+def show_results(results, results_count, root):
     # we start the toplevel
     top_level = Toplevel(root)
     top_level.minsize(800, 400)
@@ -267,14 +299,14 @@ def show_results(results, root):
             # there are times that text is not Unicode formatted, show we catch the exception
             try:
                 # we try to insert the text into the listbox
-                l.insert('end', "%d  ->> " % counter + tweet["whole_text"])
+                l.insert('end', "%d  ->> " % counter + tweet["_id"])
                 counter += 1
             except TclError as e:
                 read_write.log_message(LOG_NAME + " (show_results) :: WARN :: TclError:" + str(e))
                 pass
         else:
             # if we show 1000 tweets, inform the user how many we didn't show
-            remaining = results.count() - counter
+            remaining = results_count - counter
             message = "%d  ->> " % counter + "Remaining %d " % remaining + "more tweets. "
             message += "Too many to show them!"
             l.insert('end', message)
