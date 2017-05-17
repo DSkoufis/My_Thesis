@@ -187,7 +187,13 @@ def create_text_index(collection):
 # this function is used if user creates an index. We replace the old frame with the new one, that let the user
 # search for a keyword after we create a text index for this collection
 def change_frames(collection, frame, root):
-    create_text_index(collection)
+    try:
+        create_text_index(collection)
+    except AutoReconnect as e:
+        # if we have disconnected from the DB, return
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
     frame.destroy()
     pack_has_index_frame(root)
 
