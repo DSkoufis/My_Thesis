@@ -5,7 +5,8 @@
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox
-from Utilities import graph_utils, read_write
+from pymongo.errors import AutoReconnect
+from Utilities import graph_utils, read_write, db_utils, other_utils
 
 LOG_NAME = "--> stats_util.py"
 
@@ -70,7 +71,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # else try to convert the value into string
             more_than_value = int(exclude_more_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (TZ Graph) :: ERROR :: " + str(ve)
+            message = LOG_NAME + " (TZ Graph) :: ERROR :: ValueError:" + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -85,7 +86,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # else try to convert the value into string
             less_than_value = int(exclude_less_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (TZ Graph) :: ERROR :: " + str(ve)
+            message = LOG_NAME + " (TZ Graph) :: ERROR :: ValueError:" + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -197,7 +198,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # else try to convert the value into string
             more_than_value = int(exclude_more_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (Words Graph) :: ERROR :: " + str(ve)
+            message = LOG_NAME + " (Words Graph) :: ERROR :: ValueError:" + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -212,7 +213,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # else try to convert the value into string
             less_than_value = int(exclude_less_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (Words Graph) :: ERROR :: " + str(ve)
+            message = LOG_NAME + " (Words Graph) :: ERROR :: ValueError:" + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -263,7 +264,40 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
                                        exclude_words_list_final, include_words_list_final)
 
 
-# show a Toplevel windown, that user can enter a keyword, with which we will search the collection
+# show a Toplevel window, that user can enter a keyword, with which we will search the collection
 # and show the tweet's text in a new pane
 def keyword_search(root):
-    return
+    # we start the toplevel
+    top_level = Toplevel(root)
+    top_level.minsize(400, 200)
+    read_write.set_favicon(top_level)
+    top_level.title("-- Twitter API --  text search")
+
+    collection = db_utils.get_collection()
+
+    try:
+        # trying to figure out if a text index have been created
+        indexes = collection.list_indexes()
+    except AutoReconnect as e:
+        top_level.destroy()
+        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        messagebox.showerror("Error", "Lost Connection to the DB")
+        return
+    found = False  # flag that indicates if a text index is found in the collection
+    for index in indexes:
+        index = index.to_dict()
+        try:
+            if index["key"]["_fts"] == "text":
+                found = True
+        except KeyError:
+            pass
+
+    if not found:
+        frame = other_utils.NoIndexFrame(top_level)
+        frame.create_index_btn.config(command=lambda: other_utils
+                                      .change_frames(collection=collection, frame=frame, root=top_level))
+        frame.pack()
+    else:
+        other_utils.pack_has_index_frame(top_level)
+
+    top_level.mainloop()
