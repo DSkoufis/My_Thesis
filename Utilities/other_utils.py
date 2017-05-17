@@ -291,6 +291,11 @@ def show_results(results, results_count, root):
     top_level.grid_columnconfigure(0, weight=1)
     top_level.grid_rowconfigure(0, weight=1)
 
+    # messages to inform the user
+    message = "######     Found %d unique results in the DB     ######" % results_count
+    l.insert('end', message)
+    l.insert('end', ' ')
+
     # we show the results
     counter = 1  # counter to keep track of the lines
     for tweet in results:
@@ -307,8 +312,9 @@ def show_results(results, results_count, root):
         else:
             # if we show 1000 tweets, inform the user how many we didn't show
             remaining = results_count - counter
-            message = "%d  ->> " % counter + "Remaining %d " % remaining + "more tweets. "
-            message += "Too many to show them!"
+            message = "######     Remaining %d " % remaining + "more tweets. "
+            message += "Too many to show them!     ######"
+            l.insert('end', ' ')
             l.insert('end', message)
             break
 
