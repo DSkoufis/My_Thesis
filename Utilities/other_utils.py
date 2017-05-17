@@ -184,22 +184,29 @@ def create_text_index(collection):
     read_write.log_message(LOG_NAME + " :: INFO :: Text index created for collection: " + collection.name)
 
 
+# this function is used if user creates an index. We replace the old frame with the new one, that let the user
+# search for a keyword after we create a text index for this collection
 def change_frames(collection, frame, root):
     create_text_index(collection)
     frame.destroy()
     pack_has_index_frame(root)
 
 
+# we use this function every time we want to pack the HasIndexFrame. This is used in stats_utils too, so that's why
+# I made it
 def pack_has_index_frame(root):
-    frame = HasIndexFrame(root)
+    frame = HasIndexFrame(root)  # we get the frame
     frame.search_btn.config(command=lambda: search_in_db(frame, root))
     frame.pack()
 
 
+# this function is called when user clicks on the search DB button from the "search tweets" window
+# it gets the value of the entry and executes the query. At the end, if results are too many, informs the user
 def search_in_db(frame, root):
     collection = db_utils.get_collection()
 
     keyword = frame.keyword_entry.get()
+    # if user don't specified a keyword, show an error and return
     if keyword.strip(" ") is "":
         messagebox.showerror("Error", "You must specify a keyword")
         return
@@ -207,26 +214,24 @@ def search_in_db(frame, root):
     query = {"$text": {"$search": '"' + keyword + '"'}}
     projection = ({"whole_text": 1, "_id": 0})
     read_write.log_message(LOG_NAME + " (search_in_db) :: INFO :: Searching db for " + keyword)
-    results = collection.find(query, projection)
+    results = collection.find(query, projection)  # perform a find query in the collection
 
     try:
-        results_count = results.count()
+        results_count = results.count()  # count the results
     except AutoReconnect as e:
+        # if we have disconnected from the DB, return
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
 
-    if 0 < results_count < 1000:
+    # we show the results, if we have any, in a new window
+    if 0 < results_count:
         read_write.log_message(LOG_NAME + " :: INFO :: Found " + str(results_count) + " results")
         show_results(results, root)
     else:
-        message = LOG_NAME + " :: WARNING :: Found " + str(results_count) + " results. "
-        message += "Too many, can't show them"
+        messagebox.showinfo("Empty", "No results found for " + keyword + "!")
+        message = LOG_NAME + " :: WARNING :: No results found for " + keyword
         read_write.log_message(message)
-        if results_count > 0:
-            messagebox.showwarning("Too many", "Too many results found. Can't show them!")
-        else:
-            messagebox.showinfo("Empty", "No results found for " + keyword + "!")
 
 
 def show_results(results, root):
@@ -236,6 +241,9 @@ def show_results(results, root):
     read_write.set_favicon(top_level)
     top_level.title("-- Twitter API --  search results")
 
+    # because frames don't have scrollbars, we place the results into a listbox
+    # solution found on the tkinter documentation
+    # http://www.tkdocs.com/tutorial/morewidgets.html#scrollbar
     l = Listbox(top_level, height=5)
     l.grid(column=0, row=0, sticky=(N, W, E, S))
     s = Scrollbar(top_level, orient=VERTICAL, command=l.yview)
@@ -245,18 +253,31 @@ def show_results(results, root):
     top_level.grid_columnconfigure(0, weight=1)
     top_level.grid_rowconfigure(0, weight=1)
 
-    counter = 1
+    # we show the results
+    counter = 1  # counter to keep track of the lines
     for tweet in results:
-        try:
-            l.insert('end', "%d  ->> " % counter + tweet["whole_text"])
-            counter += 1
-        except TclError as e:
-            read_write.log_message(LOG_NAME + " (show_results) :: WARN :: TclError:" + str(e))
-            pass
+        # we only show the first 1000 results
+        if counter <= 1000:
+            # there are times that text is not Unicode formatted, show we catch the exception
+            try:
+                # we try to insert the text into the listbox
+                l.insert('end', "%d  ->> " % counter + tweet["whole_text"])
+                counter += 1
+            except TclError as e:
+                read_write.log_message(LOG_NAME + " (show_results) :: WARN :: TclError:" + str(e))
+                pass
+        else:
+            # if we show 1000 tweets, inform the user how many we didn't show
+            remaining = results.count() - counter
+            message = "%d  ->> " % counter + "Remaining %d " % remaining + "more tweets. "
+            message += "Too many to show them!"
+            l.insert('end', message)
+            break
 
     top_level.mainloop()
 
 
+# two classes here, to use them in the "search tweets" pane. We can't use them in frames.py, because of the imports
 class NoIndexFrame(Frame):
     def __init__(self, master):
         super(NoIndexFrame, self).__init__(master)

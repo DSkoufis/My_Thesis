@@ -290,6 +290,7 @@ def keyword_search(root):
             if index["key"]["_fts"] == "text":
                 found = True
         except KeyError:
+            # exception doesn't matter, we just need to find the text index
             pass
 
     if not found:
