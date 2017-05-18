@@ -177,7 +177,7 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
 
     # this is what we request from the MongoDB, we use the aggregation framework
     pipeline = [{"$unwind": "$text.words"},
-                {"$group": {"_id": "$text.words.value",
+                {"$group": {"_id": "$text.words",
                             "counter": {"$sum": 1}
                             }
                  }
@@ -189,7 +189,7 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
     # if user provided some include words, make a query and retrieve these words
     if len(include_word_list) > 0:
         pipeline_include = [{"$unwind": "$text.words"},
-                            {"$group": {"_id": "$text.words.value",
+                            {"$group": {"_id": "$text.words",
                                         "counter": {"$sum": 1}
                                         }
                              },

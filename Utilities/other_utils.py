@@ -71,8 +71,8 @@ def clear_text(text):
             # find out how many times each alphabet character exists
             characters_map = map_characters(word, characters_map)
             if word not in stops:
-                entry = {"value": word}
-                words.append(entry)
+                # entry = {"value": word} # this is not needed anymore
+                words.append(word)  # we append just the word here
             else:
                 if word in punctuation:
                     punctuations.append(word)
