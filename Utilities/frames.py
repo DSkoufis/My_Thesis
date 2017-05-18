@@ -1,9 +1,8 @@
 ######################################################
 # Module that holds all Frame object for the program #
 ######################################################
-from tkinter import *
-from tkinter.ttk import *
-from tkinter import messagebox
+from tkinter import Listbox, messagebox, StringVar, N, W, E, S
+from tkinter.ttk import Button, Label, Entry, Frame, Radiobutton, Style
 from Utilities import read_write, db_utils, stream_util, search_util, graph_utils, stats_utils
 from pymongo import DESCENDING
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
@@ -498,9 +497,16 @@ class StatsFrame(Frame):
                     read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
                                            "5000 tweets in the DB.")
                 else:
-                    # no quick facts
-                    Label(self.quick_facts_frm, text="No facts available, too many documents.").grid(row=2, column=1,
-                                                                                                     pady=10, ipadx=4)
+                    warning_style = Style()
+                    warning_style.configure("Warning.TLabel", foreground="black", background="red")
+                    # show warnings to the user. Then it's not my fault if he wants to wait
+                    message = "No facts available, too many documents.\nOperation will take too long to complete!"
+                    self.warning_lbl = Label(self.quick_facts_frm, text=message)
+                    self.warning_lbl.grid(row=2, column=0, columnspan=3, pady=10, ipadx=4, sticky=(S, E))
+                    self.warning_lbl.configure(style="Warning.TLabel")
+                    self.show_qf_btn = Button(self.quick_facts_frm, text="Show Quick Facts",
+                                              command=lambda: self.show_quick_facts(show_warning=True))
+                    self.show_qf_btn.grid(row=3, column=0, pady=10, ipadx=40, columnspan=3)
                     read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
                                            "100000 tweets in the DB.")
 
@@ -541,7 +547,16 @@ class StatsFrame(Frame):
         self.exit_btn = Button(exit_frm, text="Exit", command=self.safe_exit)
         self.exit_btn.grid(row=0, column=3, ipadx=5, ipady=3, padx=15, pady=10)
 
-    def show_quick_facts(self, *args):
+    def show_quick_facts(self, *args, **kwargs):
+        if "show_warning" in kwargs:
+            title = "Be very careful"
+            message = "This operation may take really long.\n\nAre you sure you want to continue?"
+            x = messagebox.askyesno(title=title, message=message, icon="warning")
+            if not x:
+                return  # if user clicked 'NO' we don't continue further
+            else:
+                self.warning_lbl.destroy()  # in other words, continue your work
+
         # iterate the cursor once here and find all values you want
         unique_users = []  # how many unique users we have
         max_counter = 0  # the most statuses count from a user
