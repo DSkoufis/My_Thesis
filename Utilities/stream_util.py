@@ -61,7 +61,7 @@ class StdOutListener(StreamListener):
             return True
 
         # we pass our data into this static method to clean them and keep only the necessary
-        our_tweet = self.process_tweet(data)
+        our_tweet = other_utils.process_and_clear_tweet(data, method="stream")
         try:
             # this method try to save our tweet to the active connection to Mongo and returns the outcome
             # If all are OK, returns True, but if it fail, it returns False. With this way, we keep track
@@ -130,40 +130,6 @@ class StdOutListener(StreamListener):
 
     def set_pause(self, value):
         self.pause_flag = value
-
-    def process_tweet(self, tweet):
-        # clearing the text of a tweet into two lists
-        text = other_utils.clear_text(tweet["text"])
-
-        # check if this tweet is a retweet
-        if "rt" in text["stop_words"]:
-            is_retweet = True
-        else:
-            is_retweet = False
-
-        formatted_tweet = {"created_at": datetime.strptime(tweet["created_at"], "%a %b %d %H:%M:%S %z %Y"),
-                           "favourite_count": tweet["favorite_count"],
-                           "_id": tweet["id"],  # this will make the tweet's id, ObjectID
-                           "retweet_count": tweet["retweet_count"],
-                           "coordinates": tweet["coordinates"],
-                           "timestamp": other_utils.get_timestamp(),
-                           "is_retweet": is_retweet,
-                           "text": text,
-                           "whole_text": tweet["text"],
-                           "user": {
-                               "favourites_count": tweet["user"]["favourites_count"],
-                               "followers_count": tweet["user"]["followers_count"],
-                               "friends_count": tweet["user"]["friends_count"],
-                               "id_str": tweet["user"]["id_str"],
-                               "statuses_count": tweet["user"]["statuses_count"],
-                               "verified": tweet["user"]["verified"],
-                               "created_at": datetime.strptime(tweet["user"]["created_at"], "%a %b %d %H:%M:%S %z %Y"),
-                               "geo_enabled": tweet["user"]["geo_enabled"],
-                               "location": tweet["user"]["location"],
-                               "time_zone": tweet["user"]["time_zone"],
-                               "utc_offset": tweet["user"]["utc_offset"]
-                           }}
-        return formatted_tweet
 
 
 # class that is responsible to start or close the threads of the stream
