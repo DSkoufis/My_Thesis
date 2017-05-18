@@ -1,7 +1,7 @@
-# My_Thesis
-Project development for my thesis
+# My_Dissertation
+Project development for my dissertation
 
-This is a python project for my thesis.
+This is a python project for my dissertation.
 
 The idea, is to gather tweets from Twitter with the help of Twitter REST APIs, Search and Streaming. Then all
 data will go into a MongoDB instance for storing purposes. Finally, through a GUI, the user will be able to see some statistics or
