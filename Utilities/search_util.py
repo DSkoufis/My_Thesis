@@ -69,7 +69,7 @@ class SearchController(object):
                     raise TweepError("No more tweets found! Terminating search...")
 
                 for tweet in new_tweets:
-                    our_tweet = self.process_tweet(tweet)
+                    our_tweet = other_utils.process_and_clear_tweet(tweet, method="search")
                     if db_utils.store_tweet(our_tweet):
                         tweet_count += 1  # we count how many tweets we got
                     else:
@@ -104,48 +104,6 @@ class SearchController(object):
         message += str(ignored_count) + " tweets"
         read_write.log_message(message)
         print("Search stopped successfully.")
-
-    # in this method we keep only the values we need from our tweet
-    def process_tweet(self, tweet):
-        # Fact: For a strange reason, in search mode, very few tweets have coordinates field.
-
-        # clearing the text of a tweet into two lists
-        cleared_text = other_utils.clear_text(tweet.text)
-
-        # check if this tweet is a retweet
-        if "rt" in cleared_text["stop_words"]:
-            is_retweet = True
-        else:
-            is_retweet = False
-
-        # see "anatomy of a tweet" for more details
-        # IMPORTANT: tweepy.api.search method, returns SearchResult Object
-        # we can't parse it like json, but it does the parsing itself for us
-        # only thing remaining is to call it's values like that.
-        # we again create the dictionary to store the document to MongoDB
-        formatted_tweet = {"created_at": tweet.created_at,
-                           "favourite_count": tweet.favorite_count,
-                           "_id": tweet.id,
-                           "retweet_count": tweet.retweet_count,
-                           "text": cleared_text,
-                           "whole_text": tweet.text,
-                           "is_retweet": is_retweet,
-                           "coordinates": tweet.coordinates,
-                           "timestamp": other_utils.get_timestamp(),
-                           "user": {
-                               "favourites_count": tweet.user.favourites_count,
-                               "followers_count": tweet.user.followers_count,
-                               "friends_count": tweet.user.friends_count,
-                               "id_str": tweet.user.id_str,
-                               "statuses_count": tweet.user.statuses_count,
-                               "verified": tweet.user.verified,
-                               "created_at": tweet.user.created_at,
-                               "geo_enabled": tweet.user.geo_enabled,
-                               "location": tweet.user.location,
-                               "time_zone": tweet.user.time_zone,
-                               "utc_offset": tweet.user.utc_offset,
-                           }}
-        return formatted_tweet
 
     def stop(self):
         self.stop_thread.set()

@@ -366,3 +366,74 @@ class HasIndexFrame(Frame):
         # Build the widget for exit_frm
         exit_btn = Button(exit_frm, text="Exit", command=root.destroy)
         exit_btn.grid(row=0, column=3, ipadx=5, ipady=3, padx=15, pady=10)
+
+
+def process_and_clear_tweet(tweet, **kwargs):
+    # Fact: For a strange reason, in search mode, very few tweets have coordinates field.
+
+    # clearing the text of a tweet into two lists
+    if kwargs["method"] is "stream":
+        cleared_text = clear_text(tweet["text"])
+    else:
+        cleared_text = clear_text(tweet.text)
+
+    # check if this tweet is a retweet
+    if "rt" in cleared_text["stop_words"]:
+        is_retweet = True
+    else:
+        is_retweet = False
+
+    if kwargs["method"] is "search":
+        # see "anatomy of a tweet" for more details
+        # IMPORTANT: tweepy.api.search method, returns SearchResult Object
+        # we can't parse it like json, but it does the parsing itself for us
+        # only thing remaining is to call it's values like that.
+        # we again create the dictionary to store the document to MongoDB
+        formatted_tweet = {"created_at": tweet.created_at,
+                           "favourite_count": tweet.favorite_count,
+                           "_id": tweet.id,
+                           "retweet_count": tweet.retweet_count,
+                           "coordinates": tweet.coordinates,
+                           "timestamp": get_timestamp(),
+                           "is_retweet": is_retweet,
+                           "text": cleared_text,
+                           "whole_text": tweet.text,
+                           "user": {
+                               "favourites_count": tweet.user.favourites_count,
+                               "followers_count": tweet.user.followers_count,
+                               "friends_count": tweet.user.friends_count,
+                               "id_str": tweet.user.id_str,
+                               "statuses_count": tweet.user.statuses_count,
+                               "verified": tweet.user.verified,
+                               "created_at": tweet.user.created_at,
+                               "geo_enabled": tweet.user.geo_enabled,
+                               "location": tweet.user.location,
+                               "time_zone": tweet.user.time_zone,
+                               "utc_offset": tweet.user.utc_offset,
+                           }}
+    else:
+        # this is for the data of the stream, we need to parse them differently from search
+        formatted_tweet = {"created_at": datetime.strptime(tweet["created_at"], "%a %b %d %H:%M:%S %z %Y"),
+                           "favourite_count": tweet["favorite_count"],
+                           "_id": tweet["id"],  # this will make the tweet's id, ObjectID
+                           "retweet_count": tweet["retweet_count"],
+                           "coordinates": tweet["coordinates"],
+                           "timestamp": get_timestamp(),
+                           "is_retweet": is_retweet,
+                           "text": cleared_text,
+                           "whole_text": tweet["text"],
+                           "user": {
+                               "favourites_count": tweet["user"]["favourites_count"],
+                               "followers_count": tweet["user"]["followers_count"],
+                               "friends_count": tweet["user"]["friends_count"],
+                               "id_str": tweet["user"]["id_str"],
+                               "statuses_count": tweet["user"]["statuses_count"],
+                               "verified": tweet["user"]["verified"],
+                               "created_at": datetime.strptime(tweet["user"]["created_at"], "%a %b %d %H:%M:%S %z %Y"),
+                               "geo_enabled": tweet["user"]["geo_enabled"],
+                               "location": tweet["user"]["location"],
+                               "time_zone": tweet["user"]["time_zone"],
+                               "utc_offset": tweet["user"]["utc_offset"]
+                           }}
+    # and we return the results
+    return formatted_tweet
