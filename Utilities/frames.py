@@ -266,7 +266,12 @@ class DbFrame(Frame):
                                default="cancel", parent=self.root)
         if answer:
             read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: Dropping database '" + name + "'")
-            self.client.drop_database(name)
+            try:
+                self.client.drop_database(name)
+            except ServerSelectionTimeoutError as e:
+                read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                messagebox.showerror("Error", "Lost Connection to the DB")
+                return
             self.hide_dbs()
             self.show_dbs()
 
@@ -277,7 +282,12 @@ class DbFrame(Frame):
         if answer:
             read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: Dropping collection '" + name + "'")
             db_name = self.db_entry.get()
-            self.client[db_name].drop_collection(name)
+            try:
+                self.client[db_name].drop_collection(name)
+            except ServerSelectionTimeoutError as e:
+                read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                messagebox.showerror("Error", "Lost Connection to the DB")
+                return
             self.hide_collections()
             self.show_collections()
 
