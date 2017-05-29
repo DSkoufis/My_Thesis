@@ -51,7 +51,8 @@ def show_tweets_per_tz_graph(root):
                            command=lambda: calculate_tzs_graph(exclude_more_than_entry.get(),
                                                                exclude_less_than_entry.get(),
                                                                exclude_tz_entry.get(),
-                                                               include_tz_entry.get()))
+                                                               include_tz_entry.get(),
+                                                               top_level))
     calculate_btn.pack(ipady=2, pady=20, padx=30, fill=X)
 
     exit_btn = Button(top_level, text="Exit", command=top_level.destroy)
@@ -62,7 +63,7 @@ def show_tweets_per_tz_graph(root):
 
 # this function checks if user gave correct values into the Entries and if yes,
 # we pass the data into graph_utils.show_tz_distribution function to build the bar plot
-def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tzs_str, include_tzs_str):
+def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tzs_str, include_tzs_str, root):
     # if user left this entry empty, we have the maximum value
     if exclude_more_than_str.strip(" ") is "":
         more_than_value = 1000000000
@@ -75,7 +76,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
-            messagebox.showerror("Error", "'More than' value must be an integer number!")
+            messagebox.showerror("Error", "'More than' value must be an integer number!", parent=root)
             return
 
     # if user left this entry empty, we have the minimum init value
@@ -90,7 +91,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
-            messagebox.showerror("Error", "'Less than' value must be an integer number!")
+            messagebox.showerror("Error", "'Less than' value must be an integer number!", parent=root)
             return
 
     # if exclude values are set wrong, return the error
@@ -98,7 +99,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
         message = LOG_NAME + " (TZ Graph) :: ERROR :: " + "Values are set wrong."
         print(message)
         read_write.log_message(message)
-        messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.")
+        messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.", parent=root)
         return
 
     # build the list with zones to exclude
@@ -133,7 +134,8 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
         in_stripped_tz = in_stripped_tz.rstrip()  # strips trailing ws
         include_tzs_list_final.append(in_stripped_tz)
 
-    graph_utils.show_tz_distribution(more_than_value, less_than_value, exclude_tzs_list_final, include_tzs_list_final)
+    graph_utils.show_tz_distribution(more_than_value, less_than_value, exclude_tzs_list_final,
+                                     include_tzs_list_final, root)
 
 
 # function that build a TopLevel window to let the user apply some filters before showing word graph
@@ -178,7 +180,8 @@ def show_words_graph(root):
                            command=lambda: calculate_words_graph(exclude_more_than_entry.get(),
                                                                  exclude_less_than_entry.get(),
                                                                  exclude_words_entry.get(),
-                                                                 include_words_entry.get()))
+                                                                 include_words_entry.get(),
+                                                                 top_level))
     calculate_btn.pack(ipady=2, pady=20, padx=30, fill=X)
 
     exit_btn = Button(top_level, text="Exit", command=top_level.destroy)
@@ -189,7 +192,8 @@ def show_words_graph(root):
 
 # this function checks if user gave correct values into the Entries and if yes,
 # we pass the data into graph_utils.show_words_distribution function to build the bar plot for the words
-def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_words_list_str, include_words_list_str):
+def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_words_list_str,
+                          include_words_list_str, root):
     # if user left this entry empty, we have the maximum value
     if exclude_more_than_str.strip(" ") is "":
         more_than_value = 1000000000
@@ -202,7 +206,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
-            messagebox.showerror("Error", "'More than' value must be an integer number!")
+            messagebox.showerror("Error", "'More than' value must be an integer number!", parent=root)
             return
 
     # if user left this entry empty, we have the minimum init value
@@ -217,7 +221,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
-            messagebox.showerror("Error", "'Less than' value must be an integer number!")
+            messagebox.showerror("Error", "'Less than' value must be an integer number!", parent=root)
             return
 
     # if exclude values are set wrong, return the error
@@ -225,7 +229,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
         message = LOG_NAME + " (Words Graph) :: ERROR :: " + "Values are set wrong."
         print(message)
         read_write.log_message(message)
-        messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.")
+        messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.", parent=root)
         return
 
     # build the list with zones to exclude
@@ -261,7 +265,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             include_words_list_final.append(included_word)
 
     graph_utils.show_word_distribution(more_than_value, less_than_value,
-                                       exclude_words_list_final, include_words_list_final)
+                                       exclude_words_list_final, include_words_list_final, root)
 
 
 # show a Toplevel window, that user can enter a keyword, with which we will search the collection
@@ -281,7 +285,7 @@ def keyword_search(root):
     except AutoReconnect as e:
         top_level.destroy()
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     found = False  # flag that indicates if a text index is found in the collection
     for index in indexes:

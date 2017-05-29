@@ -192,7 +192,7 @@ def change_frames(collection, frame, root):
     except AutoReconnect as e:
         # if we have disconnected from the DB, return
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     frame.destroy()
     pack_has_index_frame(root)
@@ -214,7 +214,7 @@ def search_in_db(frame, root):
     keyword = frame.keyword_entry.get()
     # if user don't specified a keyword, show an error and return
     if keyword.strip(" ") is "":
-        messagebox.showerror("Error", "You must specify a keyword")
+        messagebox.showerror("Error", "You must specify a keyword", parent=root)
         return
 
     # query = {"$text": {"$search": '"' + keyword + '"'}}
@@ -239,13 +239,13 @@ def search_in_db(frame, root):
     except ServerSelectionTimeoutError as e:
         # if we have disconnected from the DB, return
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
 
-    results_count = 0  # his is for safety, if results are empty
+    results_count = 0  # this is for safety, if results are empty
     # the only drawback of the aggregation is that we cannot count the results by calling .count()
     # it is just an iterable cursor, with dictionary
-    # although these kind of queries are very fast
+    # although these kind of queries are very fast plus this cursor has only one item
     for item in results:
         results_count = item["count"]
 
@@ -267,15 +267,15 @@ def search_in_db(frame, root):
         results = collection.aggregate(pipeline)
         show_results(results, results_count, root)
     else:
-        messagebox.showinfo("Empty", "No results found for " + keyword + "!")
-        message = LOG_NAME + " :: WARNING :: No results found for " + keyword
+        messagebox.showinfo("Empty", "No results found for '" + keyword + "'!", parent=root)
+        message = LOG_NAME + " :: INFO :: No results found for " + keyword
         read_write.log_message(message)
 
 
 def show_results(results, results_count, root):
     # we start the toplevel
     top_level = Toplevel(root)
-    top_level.minsize(800, 400)
+    top_level.minsize(1000, 500)
     read_write.set_favicon(top_level)
     top_level.title("-- Twitter API --  search results")
 

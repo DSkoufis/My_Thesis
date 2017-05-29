@@ -66,7 +66,7 @@ def show_letter_distribution():
 # @param more_than, a value that indicates from which value and above we keep our results
 # @param less_than, a value that indicates from which value and downwards we keep our results
 # @param exclude_list, a list which holds all time zones values, that the user wants to exclude from the final graph
-def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, include_list):
+def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, include_list, root):
     collection = db_utils.get_collection()
 
     # this is what we request from the MongoDB, we use the aggregation framework
@@ -79,11 +79,11 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
         results = collection.aggregate(pipeline)  # we get the cursor from the database
     except ServerSelectionTimeoutError as e:
         read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     except AutoReconnect as e:
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
 
     # in here we store all results, because PyMongo returns us a cursor
@@ -172,7 +172,7 @@ def show_coordinates_map():
 
 
 # function that is responsible to show a graph with word distribution after applying the desired filters
-def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_list, include_word_list):
+def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_list, include_word_list, root):
     collection = db_utils.get_collection()
 
     # this is what we request from the MongoDB, we use the aggregation framework
@@ -235,11 +235,11 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
         results = collection.aggregate(pipeline)  # we get the cursor from the database
     except ServerSelectionTimeoutError as e:
         read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     except AutoReconnect as e:
         read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
-        messagebox.showerror("Error", "Lost Connection to the DB")
+        messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
 
     for word in results:
