@@ -217,13 +217,16 @@ def search_in_db(frame, root):
         messagebox.showerror("Error", "You must specify a keyword", parent=root)
         return
 
+    # if user gave more keywords in the box, we search for combination of this phrase
+    list_of_keywords = keyword.split(" ")
+
     # query = {"$text": {"$search": '"' + keyword + '"'}}
     # projection = ({"whole_text": 1, "_id": 0})
     # results = collection.find(query, projection)  # perform a find query in the collection
     read_write.log_message(LOG_NAME + " (search_in_db) :: INFO :: Searching db for " + keyword)
     pipeline = [{"$match":
                      {"$text":
-                          {"$search": '"' + keyword + '"'
+                          {"$search": "'"
                            }
                       }
                  },
@@ -233,6 +236,12 @@ def search_in_db(frame, root):
                  },
                 {"$count": "count"
                  }]
+
+    for a_keyword in list_of_keywords:
+        pipeline[0]["$match"]["$text"]["$search"] += '"' + a_keyword + '" '
+
+    pipeline[0]["$match"]["$text"]["$search"] += "'"
+
     try:
         # this returns how many different results we have {"count": 2045}
         results = collection.aggregate(pipeline)
@@ -255,7 +264,7 @@ def search_in_db(frame, root):
         # getting the results to show them
         pipeline = [{"$match":
                          {"$text":
-                              {"$search": '"' + keyword + '"'
+                              {"$search": "'"
                                }
                           }
                      },
@@ -263,6 +272,12 @@ def search_in_db(frame, root):
                          {"_id": "$whole_text"
                           }
                      }]
+
+        for a_keyword in list_of_keywords:
+            pipeline[0]["$match"]["$text"]["$search"] += '"' + a_keyword + '" '
+
+        pipeline[0]["$match"]["$text"]["$search"] += "'"
+
         # this returns the different results
         results = collection.aggregate(pipeline)
         show_results(results, results_count, root)
