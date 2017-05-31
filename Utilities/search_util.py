@@ -7,7 +7,7 @@ from threading import Thread, Event
 from tweepy import TweepError
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 
-LOG_NAME = "--> search_util.py"
+LOG_NAME = " (search_util) : "
 
 
 class SearchController(object):
@@ -18,7 +18,7 @@ class SearchController(object):
         self.pause_search = False
 
         self.stop_thread = Event()
-        read_write.log_message(LOG_NAME + " :: INFO :: SearchController initialized")
+        read_write.log_message("[INFO]" + LOG_NAME + "SearchController initialized")
 
     def combine(self):
         self.stop_thread.clear()
@@ -37,9 +37,9 @@ class SearchController(object):
         read_write.write_keywords(query)
 
         print("#### Gathering tweets for '" + query + "' keyword. ####")
-        read_write.log_message(LOG_NAME + " :: INFO :: #### Gathering tweets for '" + query + "' keyword. ####")
+        read_write.log_message("[INFO]" + LOG_NAME + "#### Gathering tweets for '" + query + "' keyword. ####")
         tweets_per_query = 100  # how many tweets we can ask for
-        read_write.log_message(LOG_NAME + " :: INFO :: Tweets per query = " + str(tweets_per_query))
+        read_write.log_message("[INFO]" + LOG_NAME + "Tweets per query = " + str(tweets_per_query))
 
         since_ID = None
         max_ID = -1
@@ -80,27 +80,27 @@ class SearchController(object):
 
                 max_ID = new_tweets[-1].id  # we need to re - set the max_ID for the new search query
             except TweepError as e:
-                message = LOG_NAME + " :: ERROR :: TweepError:" + str(e)
+                message = "[ERROR]" + LOG_NAME + "TweepError: " + str(e)
                 print(message)  # we log the error
                 read_write.log_message(message)
                 break
             except AttributeError as e:
-                message_1 = LOG_NAME + " :: ERROR :: AttributeError:" + str(e)
+                message_1 = "[ERROR]" + LOG_NAME + "AttributeError: " + str(e)
                 read_write.log_message(message_1)
-                message_2 = LOG_NAME + " :: REASON :: Can't connect to Twitter Server."
+                message_2 = "[REASON]" + LOG_NAME + "Can't connect to Twitter Server."
                 print(message_1 + "\n" + message_2)
                 read_write.log_message(message_2)
                 break
             except ServerSelectionTimeoutError as e:
-                read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
                 messagebox.showerror("Error", "Lost Connection to the DB")
                 break
             except AutoReconnect as e:
-                read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+                read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
                 messagebox.showerror("Error", "Lost Connection to the DB")
                 break
-        read_write.log_message(LOG_NAME + " :: INFO :: Search stopped successfully.")
-        message = LOG_NAME + " :: INFO :: Gathered " + str(tweet_count) + " tweets - Ignored "
+        read_write.log_message("[INFO]" + LOG_NAME + "Search stopped successfully.")
+        message = "[INFO]" + LOG_NAME + "Gathered " + str(tweet_count) + " tweets - Ignored "
         message += str(ignored_count) + " tweets"
         read_write.log_message(message)
         print("Search stopped successfully.")
@@ -152,11 +152,11 @@ def pause_unpause(frame):
     global search_controller
     if search_controller.get_pause_flag():  # if flag is True, it means that we already paused the search
         search_controller.unpause()  # so un-pause it and change the GUI
-        read_write.log_message(LOG_NAME + " :: INFO :: Search unpaused...")
+        read_write.log_message("[INFO]" + LOG_NAME + "Search unpaused...")
         frame.pause_search_btn.config(text="Pause Search")
     else:
         # but if it false, it means we press the Pause Search button, so set it accordingly
         search_controller.pause()
         frame.pause_search_btn.config(text="Continue Search")
-        read_write.log_message(LOG_NAME + " :: INFO :: Search paused...")
+        read_write.log_message("[INFO]" + LOG_NAME + "Search paused...")
         print("Search paused...")

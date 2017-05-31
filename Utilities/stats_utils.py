@@ -8,7 +8,7 @@ from tkinter import messagebox
 from pymongo.errors import AutoReconnect
 from Utilities import graph_utils, read_write, db_utils, other_utils
 
-LOG_NAME = "--> stats_util.py"
+LOG_NAME = " (stats_util) : "
 
 
 # function that builds a TopLevel Window to let user exclude some values from tweets/time_zone graph
@@ -72,7 +72,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # else try to convert the value into string
             more_than_value = int(exclude_more_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (TZ Graph) :: ERROR :: ValueError:" + str(ve)
+            message = "[ERROR] (stats_utils.TZ Graph) : ValueError: " + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -87,7 +87,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
             # else try to convert the value into string
             less_than_value = int(exclude_less_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (TZ Graph) :: ERROR :: ValueError:" + str(ve)
+            message = "[ERROR] (stats_utils.TZ Graph) : ValueError: " + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -96,7 +96,7 @@ def calculate_tzs_graph(exclude_more_than_str, exclude_less_than_str, exclude_tz
 
     # if exclude values are set wrong, return the error
     if more_than_value < less_than_value:
-        message = LOG_NAME + " (TZ Graph) :: ERROR :: " + "Values are set wrong."
+        message = "[ERROR] (stats_utils.TZ Graph) : Values are set wrong."
         print(message)
         read_write.log_message(message)
         messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.", parent=root)
@@ -202,7 +202,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # else try to convert the value into string
             more_than_value = int(exclude_more_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (Words Graph) :: ERROR :: ValueError:" + str(ve)
+            message = "[ERROR] (stats_utils.Words_Graph) : ValueError: " + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -217,7 +217,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
             # else try to convert the value into string
             less_than_value = int(exclude_less_than_str)
         except ValueError as ve:
-            message = LOG_NAME + " (Words Graph) :: ERROR :: ValueError:" + str(ve)
+            message = "[ERROR] (stats_utils.Words_Graph) : ValueError: " + str(ve)
             # and if not succeed, inform the user
             print(message)  # we log the error
             read_write.log_message(message)
@@ -226,7 +226,7 @@ def calculate_words_graph(exclude_more_than_str, exclude_less_than_str, exclude_
 
     # if exclude values are set wrong, return the error
     if more_than_value < less_than_value:
-        message = LOG_NAME + " (Words Graph) :: ERROR :: " + "Values are set wrong."
+        message = "[ERROR] (stats_utils.Words_Graph) : Values are set wrong."
         print(message)
         read_write.log_message(message)
         messagebox.showwarning("Warning", "Can't set 'Less than' value bigger than 'More than' value.", parent=root)
@@ -284,7 +284,7 @@ def keyword_search(root):
         indexes = collection.list_indexes()
     except AutoReconnect as e:
         top_level.destroy()
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     found = False  # flag that indicates if a text index is found in the collection

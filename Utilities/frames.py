@@ -7,7 +7,7 @@ from Utilities import read_write, db_utils, stream_util, search_util, graph_util
 from pymongo import DESCENDING
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 
-LOG_NAME = "--> frames.py"
+LOG_NAME = " (frames) : "
 
 
 # Frame responsible to show the main menu of the Application. It has 5 buttons. If user press "Stream"
@@ -66,7 +66,7 @@ class HostFrame(Frame):
                 self.host_entry.insert(0, previous_data["host"])
                 self.port_entry.insert(0, previous_data["port"])
         except KeyError as e:
-            message = LOG_NAME + " (HostFrame) :: ERROR :: KeyError:" + str(e)
+            message = "[ERROR] (frames.HostFrame): KeyError: " + str(e)
             read_write.log_message(message)
 
         # Build the widgets for button_frm
@@ -137,13 +137,13 @@ class DbFrame(Frame):
             if previous_data["database"] is not "":
                 self.db_entry.insert(0, previous_data["database"])
         except KeyError as e:
-            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError:" + str(e)
+            message = "[ERROR] (frames.DbFrame) : KeyError: " + str(e)
             read_write.log_message(message)
         try:
             if previous_data["collection"] is not "":
                 self.collection_entry.insert(0, previous_data["collection"])
         except KeyError as e:
-            message = LOG_NAME + " (DbFrame) :: ERROR :: KeyError:" + str(e)
+            message = "[ERROR] (frames.DbFrame) : KeyError: " + str(e)
             read_write.log_message(message)
 
         # Build the widgets for button_frm
@@ -177,7 +177,7 @@ class DbFrame(Frame):
         db_list = self.client.database_names()  # we get the available database names of this connection
 
         db_counter = 0
-        read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: DBs found: " + str(db_list))
+        read_write.log_message("[INFO] (frames.DbFrame) : DBs found: " + str(db_list))
         for name in db_list:
             r = Radiobutton(self.dbs_frm, text=name, variable=db_var, value=name, command=select_db)
             r.grid(row=db_counter, column=2, pady=2)
@@ -215,10 +215,10 @@ class DbFrame(Frame):
         try:
             self.populate_dbs()
         except ServerSelectionTimeoutError as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
         except AutoReconnect as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
 
         try:  # if collections already shown, we need to hide them, but if not, this will raise an exception
@@ -241,10 +241,10 @@ class DbFrame(Frame):
         try:
             self.populate_collections()
         except ServerSelectionTimeoutError as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: " + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
         except AutoReconnect as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: " + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
 
         try:  # if dbs already shown, we need to hide them, but if not, this will raise an exception
@@ -265,11 +265,11 @@ class DbFrame(Frame):
         answer = messagebox.askokcancel(title="Are you sure?", message="Are you sure you want to delete " + name,
                                default="cancel", parent=self.root)
         if answer:
-            read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: Dropping database '" + name + "'")
+            read_write.log_message("[INFO] (frames.DbFrame) : Dropping database '" + name + "'")
             try:
                 self.client.drop_database(name)
             except ServerSelectionTimeoutError as e:
-                read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
                 messagebox.showerror("Error", "Lost Connection to the DB")
                 return
             self.hide_dbs()
@@ -280,12 +280,12 @@ class DbFrame(Frame):
         answer = messagebox.askokcancel(title="Are you sure?", message="Are you sure you want to delete " + name,
                                default="cancel", parent=self.root)
         if answer:
-            read_write.log_message(LOG_NAME + " (DbFrame) :: INFO :: Dropping collection '" + name + "'")
+            read_write.log_message("[INFO] (frames.DbFrame) : Dropping collection '" + name + "'")
             db_name = self.db_entry.get()
             try:
                 self.client[db_name].drop_collection(name)
             except ServerSelectionTimeoutError as e:
-                read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
                 messagebox.showerror("Error", "Lost Connection to the DB")
                 return
             self.hide_collections()
@@ -378,7 +378,7 @@ class StreamFrame(Frame):
                                 icon="question")
         if x:
             stream_util.stream_controller.stop()
-            read_write.log_message(stream_util.LOG_NAME + " :: INFO :: Exiting...")
+            read_write.log_message("[INFO]" + stream_util.LOG_NAME + "Exiting...")
             self.root.destroy()
 
 
@@ -462,7 +462,7 @@ class SearchFrame(Frame):
                                 icon="question")
         if x:
             search_util.search_controller.stop()
-            read_write.log_message(search_util.LOG_NAME + " :: INFO :: Exiting...")
+            read_write.log_message("[INFO]" + search_util.LOG_NAME + "Exiting...")
             self.root.destroy()
 
 
@@ -483,7 +483,7 @@ class StatsFrame(Frame):
 
         Label(self.quick_facts_frm, text="Total unique tweets stored:").grid(row=0, column=0, padx=10, pady=2, sticky=W)
         tweets_sum = self.all_documents.count()
-        read_write.log_message(LOG_NAME + " (StatsFrame) :: INFO :: Found " + str(tweets_sum) + " tweets in the DB")
+        read_write.log_message("[INFO] (frames.StatsFrame) : Found " + str(tweets_sum) + " tweets in the DB")
         Label(self.quick_facts_frm, text=str(tweets_sum)).grid(row=0, column=2, pady=2, sticky=W)
 
         # if we use a collection with no stored tweets, we do not show any data or metric
@@ -504,7 +504,7 @@ class StatsFrame(Frame):
                     self.show_qf_btn = Button(self.quick_facts_frm, text="Show Quick Facts",
                                               command=self.show_quick_facts)
                     self.show_qf_btn.grid(row=2, column=0, pady=10, ipadx=40, columnspan=3)
-                    read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
+                    read_write.log_message("[WARN] (frames.StatsFrame) : Found more than " +
                                            "5000 tweets in the DB.")
                 else:
                     warning_style = Style()
@@ -517,7 +517,7 @@ class StatsFrame(Frame):
                     self.show_qf_btn = Button(self.quick_facts_frm, text="Show Quick Facts",
                                               command=lambda: self.show_quick_facts(show_warning=True))
                     self.show_qf_btn.grid(row=3, column=0, pady=10, ipadx=40, columnspan=3)
-                    read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: Found more than " +
+                    read_write.log_message("[WARN] (frames.StatsFrame) : Found more than " +
                                            "100000 tweets in the DB.")
 
             # build the widgets for show_graphs_frm
@@ -547,7 +547,7 @@ class StatsFrame(Frame):
             self.keyword_search_btn.grid(row=4, column=1, pady=10, ipadx=5)
         else:  # if we have an empty collection
             message = "No documents found in this collection."
-            read_write.log_message(LOG_NAME + " (StatsFrame) :: WARNING :: " + message)
+            read_write.log_message("[WARN] (frames.StatsFrame) : " + message)
             message += "\nPlease enter some data first."
             Label(self.quick_facts_frm, text=message).grid(row=1, column=0, padx=10, pady=5)
 
@@ -578,7 +578,7 @@ class StatsFrame(Frame):
                 if item["user"]["statuses_count"] > max_counter:  # check the user.statuses_count
                     max_counter = item["user"]["statuses_count"]
         except AutoReconnect as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect:" + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
             return
         users_sum = len(unique_users)
@@ -612,5 +612,5 @@ class StatsFrame(Frame):
         x = messagebox.askyesno(title="Exit", message="Are you sure you want to exit?",
                                 icon="question")
         if x:
-            read_write.log_message(LOG_NAME + " (StatsFrame) :: INFO :: Exiting...")
+            read_write.log_message("[INFO] (frames.StatsFrame) : Exiting...")
             self.root.destroy()

@@ -1,18 +1,18 @@
 #####################################################################################################
 # Module that is responsible to some useful functionality into the project like text tokenizing etc #
 #####################################################################################################
+from Utilities import read_write, db_utils
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from datetime import datetime
-import string
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 from pymongo import TEXT
+from datetime import datetime
+import string
 from tkinter import Toplevel, Listbox, messagebox, VERTICAL, S, N, E, W, TclError
 from tkinter.ttk import Frame, Button, Entry, Label, Scrollbar, Sizegrip
-from Utilities import read_write, db_utils
 import re
 
-LOG_NAME = "--> other_utils.py"
+LOG_NAME = " (other_utils) : "
 
 stops = stopwords.words('english')
 punctuation = list(string.punctuation)
@@ -170,18 +170,10 @@ def re_build_text(text):
     return text
 
 
-# function that returns the current datetime. I do it here, because this is needed in
-# search and stream utils
-def get_timestamp():
-    now = datetime.now()
-    now = now.replace(microsecond=0)
-    return now
-
-
 # this function will create a new text index for the given collection
 def create_text_index(collection):
     collection.create_index([("whole_text", TEXT)])
-    read_write.log_message(LOG_NAME + " :: INFO :: Text index created for collection: " + collection.name)
+    read_write.log_message("[INFO]" + LOG_NAME + "Text index created for collection: " + collection.name)
 
 
 # this function is used if user creates an index. We replace the old frame with the new one, that let the user
@@ -191,7 +183,7 @@ def change_frames(collection, frame, root):
         create_text_index(collection)
     except AutoReconnect as e:
         # if we have disconnected from the DB, return
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     frame.destroy()
@@ -221,7 +213,7 @@ def search_in_db(frame, root):
     # so we must split the keywords
     list_of_keywords = keyword.split(" ")
 
-    read_write.log_message(LOG_NAME + " (search_in_db) :: INFO :: Searching db for " + keyword)
+    read_write.log_message("[INFO] (search_in_db) : Searching db for " + keyword)
 
     # first we match the phrase, we merge them to exclude duplicates
     # and finally we get the sum of the results
@@ -249,7 +241,7 @@ def search_in_db(frame, root):
         results = collection.aggregate(pipeline)
     except ServerSelectionTimeoutError as e:
         # if we have disconnected from the DB, return
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
 
@@ -262,7 +254,7 @@ def search_in_db(frame, root):
 
     # we show the results, if we have any, in a new window
     if 0 < results_count:
-        read_write.log_message(LOG_NAME + " :: INFO :: Found %d results" % results_count)
+        read_write.log_message("[INFO]" + LOG_NAME + "Found %d results" % results_count)
         # getting the results to show them
         # first we match the phrase, then we sort the results to have the more relevant first
         # and finally we merge the results
@@ -293,7 +285,7 @@ def search_in_db(frame, root):
         show_results(results, results_count, root)
     else:
         messagebox.showinfo("Empty", "No results found for '" + keyword + "'!", parent=root)
-        message = LOG_NAME + " :: INFO :: No results found for " + keyword
+        message = "[INFO]" + LOG_NAME + "No results found for " + keyword
         read_write.log_message(message)
 
 
@@ -335,7 +327,7 @@ def show_results(results, results_count, root):
                     l.itemconfigure(counter + 1, background='#dbeeff')
                 counter += 1
             except TclError as e:
-                read_write.log_message(LOG_NAME + " (show_results) :: WARN :: TclError:" + str(e))
+                read_write.log_message("[WARN] (other_utils.show_results) : TclError:" + str(e))
                 pass
         else:
             # if we show 1000 tweets, inform the user how many we didn't show
@@ -419,7 +411,7 @@ def process_and_clear_tweet(tweet, **kwargs):
                            "_id": tweet.id,
                            "retweet_count": tweet.retweet_count,
                            "coordinates": tweet.coordinates,
-                           "timestamp": get_timestamp(),
+                           "timestamp": read_write.get_timestamp(),
                            "is_retweet": is_retweet,
                            "text": cleared_text,
                            "whole_text": tweet.text,
@@ -443,7 +435,7 @@ def process_and_clear_tweet(tweet, **kwargs):
                            "_id": tweet["id"],  # this will make the tweet's id, ObjectID
                            "retweet_count": tweet["retweet_count"],
                            "coordinates": tweet["coordinates"],
-                           "timestamp": get_timestamp(),
+                           "timestamp": read_write.get_timestamp(),
                            "is_retweet": is_retweet,
                            "text": cleared_text,
                            "whole_text": tweet["text"],

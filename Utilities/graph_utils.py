@@ -1,12 +1,12 @@
+from Utilities import db_utils, other_utils, read_write
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import numpy as np
-from Utilities import db_utils, other_utils, read_write
 from operator import itemgetter
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 from tkinter import messagebox
 
-LOG_NAME = "--> graph_util.py"
+LOG_NAME = " (graph_utils) : "
 
 
 # this function shows a distribution of collected letters
@@ -22,11 +22,11 @@ def show_letter_distribution():
     try:
         results = collection.aggregate(pipeline)  # we get the cursor
     except ServerSelectionTimeoutError as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
     except AutoReconnect as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
     all_results = {}  # this is where the results will be
@@ -78,11 +78,11 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
     try:
         results = collection.aggregate(pipeline)  # we get the cursor from the database
     except ServerSelectionTimeoutError as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     except AutoReconnect as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
 
@@ -116,7 +116,7 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
 
     y_pos = np.arange(len(time_zones))
 
-    read_write.log_message(LOG_NAME + " (TZ Graph) :: INFO :: Sample sum: " + str(len(time_zones)))
+    read_write.log_message("[INFO] (graph_utils.TZ Graph) : Sample sum: " + str(len(time_zones)))
 
     plt.bar(y_pos, values, color='r', align='center')
     plt.xticks(y_pos, time_zones, rotation=45)  # rotate the strings 45 degrees
@@ -157,16 +157,16 @@ def show_coordinates_map():
             xpt, ypt = m(lon, lat)
             m.plot(xpt, ypt, 'ro', markersize=2)  # and we create the point on the map
     except ServerSelectionTimeoutError as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
     except AutoReconnect as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
 
     sample_sum = str(results.count())
-    read_write.log_message(LOG_NAME + " (Map Graph) :: INFO :: Sample sum: " + sample_sum)
+    read_write.log_message("[INFO] (graph_utils.Map Graph) : Sample sum: " + sample_sum)
     plt.title("Results of " + sample_sum + " tweets sample.")
     plt.show()
 
@@ -234,11 +234,11 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
     try:
         results = collection.aggregate(pipeline)  # we get the cursor from the database
     except ServerSelectionTimeoutError as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
     except AutoReconnect as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB", parent=root)
         return
 
@@ -261,7 +261,7 @@ def show_word_distribution(exclude_more_than, exclude_less_than, exclude_word_li
 
     y_pos = np.arange(len(all_words))
 
-    read_write.log_message(LOG_NAME + " (Words Graph) :: INFO :: Sample sum: " + str(len(all_words)))
+    read_write.log_message("[INFO] (graph_utils.Words Graph) : Sample sum: " + str(len(all_words)))
 
     plt.bar(y_pos, values, color='g', align='center')
     plt.xticks(y_pos, all_words, rotation=45)  # rotate the strings 45 degrees

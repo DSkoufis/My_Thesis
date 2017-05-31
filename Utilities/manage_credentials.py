@@ -1,10 +1,18 @@
 ##################################################################################################
 # Module that is responsible to read the credentials and return the api item back to the program #
 ##################################################################################################
-from tweepy import OAuthHandler, Stream, AppAuthHandler, API
 from Utilities import read_write
+from tweepy import OAuthHandler, Stream, AppAuthHandler, API
+import sys
 
-LOG_NAME = "--> manage_credentials.py"
+# try:
+#     from tweepy import OAuthHandler, Stream, AppAuthHandler, API
+# except ImportError as e:
+#     read_write.log_message("[FATAL] (manage_credentials) : ImportError: " + str(e))
+#     sys.exit(str(e) + ". Please install this module to continue")
+
+
+LOG_NAME = " (manage_credentials) : "
 
 
 def get_stream(listener):
@@ -14,8 +22,8 @@ def get_stream(listener):
         auth = OAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
         auth.set_access_token(credentials["access_token"], credentials["access_token_secret"])
     except KeyError as error:
-        message_er = LOG_NAME + " :: ERROR :: " + str(error)
-        message_fatal = LOG_NAME + " :: FATAL :: Error on credentials. Please check the credentials.json file."
+        message_er = "[ERROR]" + LOG_NAME + "KeyError : " + str(error)
+        message_fatal = "[FATAL]" + LOG_NAME + "Error on credentials. Please check the credentials.json file."
         print(message_er)
         print(message_fatal)
         read_write.log_message(message_er)
@@ -29,16 +37,16 @@ def get_stream(listener):
 def get_search():
     credentials = read_write.read_credentials()
     try:
-        message = LOG_NAME + " :: INFO :: Trying to connect to Search API..."
+        message = "[INFO]" + LOG_NAME + "Trying to connect to Search API..."
         print(message)
         read_write.log_message(message)
         auth = AppAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
         api = API(auth_handler=auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
-        message = LOG_NAME + " :: INFO :: Connection successful"
+        message = "[INFO]" + LOG_NAME + "Connection successful"
         print(message)
         read_write.log_message(message)
         return api
     except Exception as e:
-        message = LOG_NAME + " :: ERROR :: " + str(e)
+        message = "[ERROR]" + LOG_NAME + str(e)
         print(message)
         read_write.log_message(message)

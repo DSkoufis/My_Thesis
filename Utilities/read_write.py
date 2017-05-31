@@ -3,16 +3,23 @@
 ###############################################################
 import json
 import os
-from Utilities import other_utils
+from datetime import datetime
 
-LOG_NAME = "--> read_write.py"
+LOG_NAME = " (read_write) : "
 
 file_path = os.path.abspath("Ufiles")
 
+
+# function that returns the current datetime. I do it here, because this is needed in
+def get_timestamp():
+    now = datetime.now()
+    now = now.replace(microsecond=0)
+    return now
+
 # we initialize a log_file, every time the program starts
-log_file = str(other_utils.get_timestamp()).replace(' ', '_').replace(':', '-') + ".log"
+log_file = str(get_timestamp()).replace(' ', '_').replace(':', '-') + ".log"
 log_path = os.path.abspath("Ulogs/" + log_file)
-print(LOG_NAME + " :: INFO :: Log file path set: " + str(log_path))
+print("[INFO] Log file path set: " + str(log_path))
 
 
 # function that returns the data in json format from mongo.json file
@@ -21,7 +28,7 @@ def read_mongo():
         with open(os.path.abspath(file_path + "/mongo.json")) as datafile:
             data = json.load(datafile)
     except FileNotFoundError as fe:
-        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        message = "[ERROR]" + LOG_NAME + "FileNotFoundError: " + str(fe)
         print(message)
         log_message(message)
         data = []
@@ -34,7 +41,7 @@ def read_last():
         with open(os.path.abspath(file_path + "/last.json")) as datafile:
             data = json.load(datafile)
     except FileNotFoundError as fe:
-        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        message = "[ERROR]" + LOG_NAME + "FileNotFoundError: " + str(fe)
         print(message)
         log_message(message)
         data = {}
@@ -47,7 +54,7 @@ def read_keywords():
         with open(os.path.abspath(file_path + "/keywords.json")) as datafile:
             data = json.load(datafile)
     except FileNotFoundError as fe:
-        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        message = "[ERROR]" + LOG_NAME + "FileNotFoundError: " + str(fe)
         print(message)
         log_message(message)
         data = []
@@ -60,7 +67,7 @@ def read_credentials():
         with open(os.path.abspath(file_path + "/credentials.json")) as datafile:
             credentials = json.load(datafile)
     except FileNotFoundError as fe:
-        message = LOG_NAME + " :: ERROR :: FileNotFoundError:" + str(fe)
+        message = "[ERROR]" + LOG_NAME + "FileNotFoundError: " + str(fe)
         print(message)
         log_message(message)
         credentials = {}
@@ -96,11 +103,13 @@ def write_keywords(data):
 
 # function that opens the log file and appends the new message
 def log_message(message):
+    # XXXXX TODO: fix this
+    # return
     with open(log_path, "a") as logging:
         try:
-            logging.write(str(other_utils.get_timestamp()) + message + "\n")
+            logging.write(str(get_timestamp()) + " >> " + message + "\n")
         except UnicodeEncodeError as e:
-            message = str(other_utils.get_timestamp()) + LOG_NAME + " :: WARN :: UnicodeEncodeError:" + str(e) + "\n"
+            message = str(get_timestamp()) + "[WARN]" + LOG_NAME + "UnicodeEncodeError: " + str(e) + "\n"
             logging.write(message)
 
 

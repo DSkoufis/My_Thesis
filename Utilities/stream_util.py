@@ -1,14 +1,13 @@
 #######################################################################################
 # Module that is responsible to connect to the Streaming Server and gather the tweets #
 #######################################################################################
+from Utilities import db_utils, manage_credentials, read_write, other_utils
 from tweepy import StreamListener
 import json
 from tkinter import messagebox
-from datetime import datetime
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
-from Utilities import db_utils, manage_credentials, read_write, other_utils
 
-LOG_NAME = "--> stream_util.py"
+LOG_NAME = " (stream_util) : "
 
 
 # Class that inherits StreamListener and handles the data.
@@ -18,12 +17,12 @@ class StdOutListener(StreamListener):
         self.flag = False  # this flag indicates if stream must stop or not. As long as it is False, we keep stream open
         self.pause_flag = False  # as long as false, pause is closed
         self.store_counter = None  # this counter, counts how many tweets stored to the DB so far
-        read_write.log_message(LOG_NAME + " :: INFO :: StreamListener initialized")
+        read_write.log_message("[INFO]" + LOG_NAME + "StreamListener initialized")
 
     def on_connect(self):
         global stream_controller
-        message_1 = LOG_NAME + " :: SUCCESS :: Connected to Streaming Server!"
-        message_2 = LOG_NAME + " :: INFO :: #### Gathering tweets for '" + stream_controller.search_keyword \
+        message_1 = "[SUCCESS]" + LOG_NAME + "Connected to Streaming Server!"
+        message_2 = "[INFO]" + LOG_NAME + "#### Gathering tweets for '" + stream_controller.search_keyword \
                     + "' keyword. ####"
         print(message_2)
         read_write.log_message(message_1)
@@ -41,7 +40,7 @@ class StdOutListener(StreamListener):
 
     def on_data(self, data):
         if self.flag:  # flag keep track if we want to stop the stream
-            read_write.log_message(LOG_NAME + " :: INFO :: Gathered " +
+            read_write.log_message("[INFO]" + LOG_NAME + "Gathered " +
                                    str(self.store_counter) +
                                    " tweets - Ignored " + str(self.ignore_counter) +
                                    " tweets")
@@ -73,11 +72,11 @@ class StdOutListener(StreamListener):
             else:
                 self.ignore_counter += 1
         except ServerSelectionTimeoutError as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
             return False
         except AutoReconnect as e:
-            read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+            read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
             messagebox.showerror("Error", "Lost Connection to the DB")
             return False
 
@@ -88,40 +87,40 @@ class StdOutListener(StreamListener):
         # statuses take from here:
         # https://dev.twitter.com/overview/api/response-codes
         if status == 401:
-            message = LOG_NAME + " :: HTTP_ERROR :: 401 Unauthorized - Missing or incorrect authentication credentials."
+            message = "[HTTP_ERROR]" + LOG_NAME + "401 Unauthorized - Missing or incorrect authentication credentials."
         elif status == 304:
-            message = LOG_NAME + " :: HTTP_ERROR :: 304 Not Modified - There was no new data to return."
+            message = "[HTTP_ERROR]" + LOG_NAME + "304 Not Modified - There was no new data to return."
         elif status == 403:
-            message = LOG_NAME + " :: HTTP_ERROR :: 403 Forbidden - The request is understood, " + \
+            message = "[HTTP_ERROR]" + LOG_NAME + "403 Forbidden - The request is understood, " + \
                       "but it has been refused or access is not allowed."
         elif status == 420:
-            message = LOG_NAME + " :: HTTP_ERROR :: 420 Enhance Your Calm - Returned when you are being rate limited."
+            message = "[HTTP_ERROR]" + LOG_NAME + "420 Enhance Your Calm - Returned when you are being rate limited."
         elif status == 500:
-            message = LOG_NAME + " :: HTTP_ERROR :: 500 Internal Server Error - Something is broken."
+            message = "[HTTP_ERROR]" + LOG_NAME + "500 Internal Server Error - Something is broken."
         elif status == 503:
-            message = LOG_NAME + " :: HTTP_ERROR :: 503 Service Unavailable - The Twitter servers are up, " + \
+            message = "[HTTP_ERROR]" + LOG_NAME + "503 Service Unavailable - The Twitter servers are up, " + \
                       "but overloaded with requests. Try again later."
         elif status == 504:
-            message = LOG_NAME + " :: HTTP_ERROR :: 504 Gateway timeout - The Twitter servers are up, but " + \
+            message = "[HTTP_ERROR]" + LOG_NAME + "504 Gateway timeout - The Twitter servers are up, but " + \
                       "the request couldn’t be serviced due to some failure within our stack. Try again later."
         else:
-            message = LOG_NAME + " :: HTTP_ERROR :: " + status + " Unknown."
+            message = "[HTTP_ERROR]" + LOG_NAME + status + " Unknown."
 
         print(message)
         read_write.log_message(message)
-        read_write.log_message(LOG_NAME + " :: INFO :: Stopping stream")
+        read_write.log_message("[INFO]" + LOG_NAME + "Stopping stream")
         return False  # and stop the stream
 
     def on_disconnect(self, notice):
         status = json.loads(notice)
-        message = "Error on " + type(self).__name__ + " :: Name=" + status["stream_name"] + \
+        message = "[ERROR] (" + type(self).__name__ + ") : Name=" + status["stream_name"] + \
                   ", Reason=" + status["reason"] + ", Code=" + str(status["code"])
         print(message)
         read_write.log_message(message)
         return False
 
     def on_exception(self, exception):
-        read_write.log_message(LOG_NAME + " :: ERROR :: " + str(exception))
+        read_write.log_message("[ERROR]" + LOG_NAME + str(exception))
         return False
 
     # setters for the flags
@@ -137,7 +136,7 @@ class StreamController(object):
     def __init__(self):
         self.search_keyword = None
         self.listener = StdOutListener()
-        read_write.log_message(LOG_NAME + " :: INFO :: StreamController initialized")
+        read_write.log_message("[INFO]" + LOG_NAME + "StreamController initialized")
 
     # method that starts the Streaming API
     def combine(self):
@@ -167,19 +166,19 @@ class StreamController(object):
             # he must separate them with commas, so we can split them and remove the whitespace with strip
             search_list = [x.strip() for x in self.search_keyword.split(",")]
 
-            message = LOG_NAME + " :: INFO :: Trying to connect to the Streaming Server..."
+            message = "[INFO]" + LOG_NAME + "Trying to connect to the Streaming Server..."
             print(message)
             read_write.log_message(message)
             stream.filter(track=search_list,
                           async=True)  # start the loop, async sets the Streaming in a new Thread
         except AttributeError as e:
-            message = LOG_NAME + " :: ERROR :: AttributeError:" + str(e)
+            message = "[ERROR]" + LOG_NAME + "AttributeError: " + str(e)
             print(message)
             read_write.log_message(message)
             messagebox.showerror("Fatal error", "No credentials were found. Please close the script, " +
                                  "add the file and try again!")
         except Exception as e:
-            message = LOG_NAME + " :: ERROR :: Exception:" + str(repr(e))
+            message = "[ERROR]" + LOG_NAME + "Exception: " + str(repr(e))
             print(message)
             read_write.log_message(message)
             pass
@@ -211,13 +210,13 @@ def pause_unpause(frame):
     if stream_controller.listener.pause_flag:  # if flag is True, it means that we already paused the stream
         stream_controller.unpause()  # so un-pause it and change the GUI
         frame.pause_stream_btn.config(text="Pause Stream")
-        read_write.log_message(LOG_NAME + " :: INFO :: Continuing stream...")
+        read_write.log_message("[INFO]" + LOG_NAME + "Continuing stream...")
     else:
         # but if it false, it means we press the Pause Stream button, so set it accordingly
         stream_controller.pause()
         frame.pause_stream_btn.config(text="Continue Stream")
         print("Stream paused...")
-        read_write.log_message(LOG_NAME + " :: INFO :: Stream paused...")
+        read_write.log_message("[INFO]" + LOG_NAME + "Stream paused...")
 
 
 # function to close the stream
@@ -226,5 +225,5 @@ def stop_stream(frame):
     frame.mng_stream_btn.config(text="Start Stream", command=lambda: start_stream(frame))
     frame.pause_stream_btn.grid_remove()
     print("Terminating stream...")
-    read_write.log_message(LOG_NAME + " :: INFO :: Terminating stream...")
+    read_write.log_message("[INFO]" + LOG_NAME + "Terminating stream...")
     stream_controller.stop()  # by calling the stream controller

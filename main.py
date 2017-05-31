@@ -4,7 +4,7 @@ from Utilities import *
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 
 # variable that helps on logging
-LOG_NAME = "--> main.py"
+LOG_NAME = " (main) : "
 
 
 def goto_host_frame(root, frame):
@@ -37,7 +37,7 @@ def goto_db_frame(root, frame):
                     found = True
                     read_write.write_last(entry)  # if found, add previous data, into last.json for later access
             if not found:  # and if not found, append it on the list
-                read_write.log_message(LOG_NAME + " :: INFO :: Connection not found on mongo.json, trying to add it.")
+                read_write.log_message("[INFO]" + LOG_NAME + "Connection not found on mongo.json, trying to add it.")
                 data.append({"host": host, "port": port})
                 read_write.write_mongo(data)
         else:
@@ -76,11 +76,11 @@ def goto_stats_frame(root, frame):
     try:
         stats_frame = frames.StatsFrame(root)
     except ServerSelectionTimeoutError as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
     except AutoReconnect as e:
-        read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+        read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
         messagebox.showerror("Error", "Lost Connection to the DB")
         return
 
@@ -108,17 +108,17 @@ def goto_main_frame(root, frame):
 
         if db_validation is not None:
             if collection_validation is not None:
-                read_write.log_message(LOG_NAME + " :: INFO :: Using database: '" +
+                read_write.log_message("[INFO]" + LOG_NAME + "Using database: '" +
                                        database + "' - collection: '" + collection + "'")
                 client = db_utils.get_client()
                 try:
                     temp = client.address
                 except ServerSelectionTimeoutError as e:
-                    read_write.log_message(LOG_NAME + " :: ERROR :: ServerSelectionTimeoutError:" + str(e))
+                    read_write.log_message("[ERROR]" + LOG_NAME + "ServerSelectionTimeoutError: " + str(e))
                     messagebox.showerror("Error", "Lost Connection to the DB")
                     return
                 except AutoReconnect as e:
-                    read_write.log_message(LOG_NAME + " :: ERROR :: AutoReconnect:" + str(e))
+                    read_write.log_message("[ERROR]" + LOG_NAME + "AutoReconnect: " + str(e))
                     messagebox.showerror("Error", "Lost Connection to the DB")
                     return
                 host = temp[0]
@@ -147,12 +147,12 @@ def goto_main_frame(root, frame):
                 # these are all errors, but we try to find what causes the error
                 temp_collection = frame.collection_entry.get().strip(" ")
                 if temp_collection is "":
-                    message = LOG_NAME + " :: ERROR :: Collection field was blank."
+                    message = "[ERROR]" + LOG_NAME + "Collection field was blank."
                     print(message)
                     read_write.log_message(message)
                     messagebox.showerror(title="Error", message="Give a collection name to continue", parent=root)
                 else:
-                    message = LOG_NAME + " :: ERROR :: Invalid collection name."
+                    message = "[ERROR]" + LOG_NAME + "Invalid collection name."
                     print(message)
                     read_write.log_message(message)
                     messagebox.showerror(title="Error", parent=root,
@@ -164,12 +164,12 @@ def goto_main_frame(root, frame):
             # these are all errors, but we try to find what causes the error
             temp_db = frame.db_entry.get().strip(" ")
             if temp_db is "":
-                message = LOG_NAME + " :: ERROR :: Database field was blank."
+                message = "[ERROR]" + LOG_NAME + "Database field was blank."
                 print(message)
                 read_write.log_message(message)
                 messagebox.showerror(title="Error", message="Give a database name to continue", parent=root)
             else:
-                message = LOG_NAME + " :: ERROR :: Invalid database name."
+                message = "[ERROR]" + LOG_NAME + "Invalid database name."
                 print(message)
                 read_write.log_message(message)
                 messagebox.showerror(title="Error", parent=root,
@@ -208,5 +208,5 @@ def main():
 Program starts here
 '''
 if __name__ == '__main__':
-    read_write.log_message(LOG_NAME + " :: INFO :: Program starts")
+    read_write.log_message("[ERROR]" + LOG_NAME + "Program starts")
     main()
