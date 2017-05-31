@@ -208,5 +208,5 @@ def main():
 Program starts here
 '''
 if __name__ == '__main__':
-    read_write.log_message("[ERROR]" + LOG_NAME + "Program starts")
+    read_write.log_message("[INFO]" + LOG_NAME + "Program starts")
     main()
