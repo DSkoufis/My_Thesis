@@ -29,7 +29,7 @@ Secondly, make sure you have installed Python3.5 & MongoDB (I use 3.4).
 
 >MODULES
 
-`pip install <module name>`
+`pip install <module name>` OR better navigate to project root folder `pip install -r requirements.txt`
 - tweepy==3.5.0
 - nltk==3.2.4
 - pymongo==3.4.0
