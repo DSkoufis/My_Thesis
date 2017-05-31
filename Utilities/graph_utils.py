@@ -1,10 +1,16 @@
 from Utilities import db_utils, other_utils, read_write
-import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
-import numpy as np
 from operator import itemgetter
 from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
 from tkinter import messagebox
+import sys
+
+try:
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.basemap import Basemap
+    import numpy as np
+except ImportError as e:
+    read_write.log_message("[FATAL] (graph_utils) : ImportError: " + str(e))
+    sys.exit("[SEVERE] " + str(e) + ". Please install this module to continue")
 
 LOG_NAME = " (graph_utils) : "
 

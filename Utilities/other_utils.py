@@ -2,15 +2,21 @@
 # Module that is responsible to some useful functionality into the project like text tokenizing etc #
 #####################################################################################################
 from Utilities import read_write, db_utils
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
-from pymongo import TEXT
 from datetime import datetime
 import string
 from tkinter import Toplevel, Listbox, messagebox, VERTICAL, S, N, E, W, TclError
 from tkinter.ttk import Frame, Button, Entry, Label, Scrollbar, Sizegrip
 import re
+import sys
+
+try:
+    from nltk.tokenize import word_tokenize
+    from nltk.corpus import stopwords
+    from pymongo.errors import ServerSelectionTimeoutError, AutoReconnect
+    from pymongo import TEXT
+except ImportError as e:
+    read_write.log_message("[FATAL] (other_utils) : ImportError: " + str(e))
+    sys.exit("[SEVERE] " + str(e) + ". Please install this module to continue")
 
 LOG_NAME = " (other_utils) : "
 

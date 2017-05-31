@@ -2,14 +2,13 @@
 # Module that is responsible to read the credentials and return the api item back to the program #
 ##################################################################################################
 from Utilities import read_write
-from tweepy import OAuthHandler, Stream, AppAuthHandler, API
 import sys
 
-# try:
-#     from tweepy import OAuthHandler, Stream, AppAuthHandler, API
-# except ImportError as e:
-#     read_write.log_message("[FATAL] (manage_credentials) : ImportError: " + str(e))
-#     sys.exit(str(e) + ". Please install this module to continue")
+try:
+    from tweepy import OAuthHandler, Stream, AppAuthHandler, API
+except ImportError as e:
+    read_write.log_message("[FATAL] (manage_credentials) : ImportError: " + str(e))
+    sys.exit("[SEVERE] " + str(e) + ". Please install this module to continue")
 
 
 LOG_NAME = " (manage_credentials) : "
