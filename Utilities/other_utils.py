@@ -218,28 +218,30 @@ def search_in_db(frame, root):
         return
 
     # if user gave more keywords in the box, we search for combination of this phrase
+    # so we must split the keywords
     list_of_keywords = keyword.split(" ")
 
-    # query = {"$text": {"$search": '"' + keyword + '"'}}
-    # projection = ({"whole_text": 1, "_id": 0})
-    # results = collection.find(query, projection)  # perform a find query in the collection
     read_write.log_message(LOG_NAME + " (search_in_db) :: INFO :: Searching db for " + keyword)
+
+    # first we match the phrase, we merge them to exclude duplicates
+    # and finally we get the sum of the results
     pipeline = [{"$match":
                      {"$text":
-                          {"$search": "'"
-                           }
+                          {"$search": "'"}
                       }
                  },
                 {"$group":
-                     {"_id": "$whole_text"
-                      }
+                     {"_id": "$whole_text"}
                  },
                 {"$count": "count"
                  }]
 
+    # we format each keyword like: ["keyword 1", "keyword 2", ...]
     for a_keyword in list_of_keywords:
+        # and at the same time, we add them to the pipeline
         pipeline[0]["$match"]["$text"]["$search"] += '"' + a_keyword + '" '
 
+    # add a single quote at the end, to close the $search
     pipeline[0]["$match"]["$text"]["$search"] += "'"
 
     try:
@@ -262,20 +264,28 @@ def search_in_db(frame, root):
     if 0 < results_count:
         read_write.log_message(LOG_NAME + " :: INFO :: Found %d results" % results_count)
         # getting the results to show them
+        # first we match the phrase, then we sort the results to have the more relevant first
+        # and finally we merge the results
         pipeline = [{"$match":
                          {"$text":
-                              {"$search": "'"
-                               }
+                              {"$search": "'"}
+                          }
+                     },
+                    {"$sort":
+                         {"score":
+                              {"$meta": "textScore"}
                           }
                      },
                     {"$group":
-                         {"_id": "$whole_text"
-                          }
+                         {"_id": "$whole_text"}
                      }]
 
+        # we format each keyword like: ["keyword 1", "keyword 2", ...]
         for a_keyword in list_of_keywords:
+            # and at the same time, we add them to the pipeline
             pipeline[0]["$match"]["$text"]["$search"] += '"' + a_keyword + '" '
 
+        # add a single quote at the end, to close the $search
         pipeline[0]["$match"]["$text"]["$search"] += "'"
 
         # this returns the different results
