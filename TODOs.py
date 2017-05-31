@@ -9,3 +9,5 @@
 # TODO: Make a 2 axis graph -> x axis: year, y axis: user_count
 
 # TODO: Make a 2 axis graph -> x axis: users, y axis: followers-statuses-friends
+
+# TODO: Make an executable like program
