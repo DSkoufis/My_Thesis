@@ -7,6 +7,7 @@ import string
 from tkinter import Toplevel, Listbox, messagebox, VERTICAL, S, N, E, W, TclError
 from tkinter.ttk import Frame, Button, Entry, Label, Scrollbar, Sizegrip
 import re
+import os
 import sys
 
 try:
@@ -20,7 +21,18 @@ except ImportError as e:
 
 LOG_NAME = " (other_utils) : "
 
-stops = stopwords.words('english')
+try:
+    stops = stopwords.words('english')
+except LookupError as e:
+    read_write.log_message("[FATAL] (other_utils) : LookupError: " + str(e))
+    instructions = " ****   INSTALLATION INSTRUCTIONS   ****\n\n"
+    instructions += "    1) Open a new terminal and type python. This will open a python terminal\n"
+    instructions += "    2) Type import ntlk\n    3) Type nltk.download()\n"
+    instructions += "    4) This will open a new window. Search in CORPORA for the package named 'Stopwords'\n"
+    instructions += "    5) Double click OR click download to install it"
+    read_write.log_message(instructions)
+    sys.exit(str(e) + "\n" + instructions)
+
 punctuation = list(string.punctuation)
 punctuation.append("''")
 punctuation.append("``")
@@ -51,8 +63,19 @@ def clear_text(text):
     characters_map = []  # this dictionary will hold how many times each character appears in the tweet
     entities = []  # this list holds all mentions, hastags and urls
 
-    # tokenize the text into a list
-    text = word_tokenize(text)
+    try:
+        # tokenize the text into a list
+        text = word_tokenize(text)
+    except LookupError as e:
+        read_write.log_message("[FATAL] (other_utils) : LookupError: " + str(e))
+        instructions = " ****   INSTALLATION INSTRUCTIONS   ****\n\n"
+        instructions += "    1) Open a new terminal and type python. This will open a python terminal\n"
+        instructions += "    2) Type import ntlk\n    3) Type nltk.download()\n"
+        instructions += "    4) This will open a new window. Search in ALL PACKAGES for the package named 'punkt'\n"
+        instructions += "    5) Double click OR click download to install it"
+        read_write.log_message(instructions)
+        print(str(e) + "\n" + instructions)
+        os._exit(1)
 
     # re-build the string because NLTK does not understand mentions or hashtags etc
     text = re_build_text(text)
