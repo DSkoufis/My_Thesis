@@ -115,4 +115,4 @@ def log_message(message):
 
 # function that gets as argument a window and sets a favicon to it
 def set_favicon(root):
-    root.iconbitmap(os.path.abspath("favicon.ico"))
+    root.iconbitmap(os.path.abspath("Uphotos/favicon.ico"))
