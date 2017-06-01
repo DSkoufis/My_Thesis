@@ -11,3 +11,7 @@
 # TODO: Make a 2 axis graph -> x axis: users, y axis: followers-statuses-friends
 
 # TODO: Make an executable like program
+
+# TODO: I can make a wiki like directory with files that explain installation of both python and mongo
+
+# TODO: In the wiki I can include program execution screenshots and How-To
