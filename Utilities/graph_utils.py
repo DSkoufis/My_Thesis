@@ -134,6 +134,7 @@ def show_tz_distribution(exclude_more_than, exclude_less_than, exclude_list, inc
 # this functions, queries the DB and gets all the documents that has as 'coordinates' field != null. It creates a
 # map, using the Basemap extension library and it paints in every location a point which represents the coordinate
 # of each tweet, according to the Twitter response.
+# Fact: For a strange reason, in search mode, very few tweets have coordinates field.
 def show_coordinates_map():
     collection = db_utils.get_collection()
 

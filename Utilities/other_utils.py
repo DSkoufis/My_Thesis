@@ -415,8 +415,6 @@ class HasIndexFrame(Frame):
 
 
 def process_and_clear_tweet(tweet, **kwargs):
-    # Fact: For a strange reason, in search mode, very few tweets have coordinates field.
-
     # clearing the text of a tweet into two lists
     if kwargs["method"] is "stream":
         cleared_text = clear_text(tweet["text"])

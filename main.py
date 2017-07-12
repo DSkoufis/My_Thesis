@@ -19,10 +19,10 @@ def goto_host_frame(root, frame):
 def goto_db_frame(root, frame):
     # if we come from HostFrame, we need to check some things first!
     if isinstance(frame, frames.HostFrame):
-        if db_utils.can_connect(frame):  # validate the connection
-            host = frame.host_entry.get()
-            port = int(frame.port_entry.get())
-
+        response = db_utils.can_connect(frame.host_entry.get(), frame.port_entry.get())
+        if response["connect"]:  # validate the connection
+            host = response["host"]
+            port = response["port"]
             # we add the new data into last.json, because a connection happened
             data = read_write.read_last()
             data["host"] = host
@@ -42,6 +42,8 @@ def goto_db_frame(root, frame):
                 read_write.write_mongo(data)
         else:
             # if we can't connect, return and do not pack the new DbFrame
+            # and show the errors occurred
+            messagebox.showerror(title="Error", message=response["errors"], parent=frame.root)
             return
 
     # show the DbFrame
